@@ -1,15 +1,18 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 
 class Button extends StatelessWidget {
   final Color color;
   final Text text;
-  final Widget icon;
+  final Widget? icon; //  optional icon
+  final Color? borderColor;
 
   const Button({
     super.key,
     required this.color,
     required this.text,
-    required this.icon,
+    this.icon, //  not required anymore
+    this.borderColor,
   });
 
   @override
@@ -19,19 +22,19 @@ class Button extends StatelessWidget {
       height: 50,
       decoration: BoxDecoration(
         color: color,
-        borderRadius: BorderRadius.circular(15),
-        border: BoxBorder.all(
+        borderRadius: BorderRadius.circular(8),
+        border: borderColor != null ? Border.all(
           width: 1.0,
-          color: Color(0xFF726DDE),
-        )
+          color: borderColor!,
+        ):null,
       ),
       child: Padding(
-        padding: const EdgeInsets.only(top: 16,left: 8,right: 8,bottom: 16),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            icon,
-            const SizedBox(width: 20),
+            if (icon != null) icon!, //  show only if icon provided
+            if (icon != null) const SizedBox(width: 20), // spacing only if icon exists
             text,
           ],
         ),

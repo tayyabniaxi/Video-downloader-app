@@ -1,6 +1,7 @@
 class AppIcons {
   static const baseIconPath = 'assets/icons/';
   static const arrowIcon = '${baseIconPath}arrow.png';
+  static const arrow = '${baseIconPath}arrowIcon.png';
   static const downloadIcon = '${baseIconPath}download_icon.png';
   static const facebookLoginIcon = '${baseIconPath}Facebook_login.png';
   static const logo = '${baseIconPath}Logo.png';
@@ -46,6 +47,9 @@ class AppIcons {
   static const logoutIcon = '${baseIconPath}Logout-Icon.png';
   static const tick = '${baseIconPath}Tick.png';
   static const star = '${baseIconPath}star.png';
+  static const historyPicture = '${baseIconPath}HistoryPicture.png';
+  static const uploadIcon = '${baseIconPath}uploadIcon.png';
+  static const iconLink = '${baseIconPath}IconLink.png';
 }
 
 
@@ -55,4 +59,8 @@ class AppImages {
   static const loading = '${baseIconPath}Loading.png';
   static const profileImage = '${baseIconPath}Profile_Image.png';
   static const splashImage = '${baseIconPath}splash_image.png';
+  static const noHistoryImage = '${baseIconPath}NoHistoryImage.png';
+  static const proImage = '${baseIconPath}ProImage.png';
+  static const downloadVideoImage = '${baseIconPath}Download_Video_Image.png';
+  static const backgroundRemover = '${baseIconPath}Background-Remover.png';
 }
