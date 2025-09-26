@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:get/get.dart';
 import 'package:qaisar/assets/app_assets.dart';
 import 'package:qaisar/components/button.dart';
 import 'package:qaisar/data/plateform_data.dart';
 import 'package:qaisar/screens/bottom_navigation_bar/my_bottom_navigation_bar.dart';
 import 'package:qaisar/screens/profile_section/profile_section.dart';
+import 'package:share_plus/share_plus.dart';
 import '../components/custom_row.dart';
+import '../video_downloader_service.dart';
 
 class HomeScreen extends StatefulWidget {
   final Map<String, dynamic>? selectedPlatform;
@@ -16,7 +20,14 @@ class HomeScreen extends StatefulWidget {
 }
 
 class HomeScreenState extends State<HomeScreen> {
+
+  final controller = Get.find<VideoDownloaderService>();
+
+  final _formkey = GlobalKey<FormState>();
+  bool _isloading = false;
+  // VideoDownloaderService _videoDownloaderService = VideoDownloaderService();
   int selectedIndex = 0;
+  TextEditingController _link = TextEditingController();
   late Map<String, dynamic> currentPlateForm;
 
   void updatePlatform(Map<String, dynamic> platform) {
@@ -29,9 +40,10 @@ class HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    currentPlateForm = widget.selectedPlatform ??
+    currentPlateForm =
+        widget.selectedPlatform ??
         {
-          "title": "Download Any Video",
+          "title": "Any Video Downloader",
           "subtitle": "Download Video From Any Platform",
           "icon": AppIcons.downloadIcon,
           "buttonColor": const Color(0xff9369DF),
@@ -50,6 +62,8 @@ class HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+   // final controller = Get.find<VideoDownloaderService>();
+    print(controller.thumbnail.value);
     final width = MediaQuery.of(context).size.width;
     final height = MediaQuery.of(context).size.height;
 
@@ -76,7 +90,7 @@ class HomeScreenState extends State<HomeScreen> {
             Image.asset(
               currentPlateForm['icon'] ?? AppIcons.downloadIcon,
               errorBuilder: (context, error, stackTrace) =>
-              const Icon(Icons.error),
+                  const Icon(Icons.error),
             ),
             SizedBox(height: height * 0.01),
 
@@ -100,44 +114,78 @@ class HomeScreenState extends State<HomeScreen> {
 
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12.0),
-              child: TextField(
-                decoration: InputDecoration(
-                  suffixIcon: Padding(
-                    padding: const EdgeInsets.only(right: 4.0),
-                    child: Container(
-                      width: width * 0.15,
-                      height: height * 0.01,
-                      decoration: BoxDecoration(
-                        color: currentPlateForm['buttonColor'] ??
-                            const Color(0xff9369DF),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      padding: const EdgeInsets.all(6),
-                      child: Image.asset(
-                        AppIcons.arrow,
-                        errorBuilder: (context, error, stackTrace) =>
-                        const Icon(Icons.arrow_forward),
-                      ),
+              child: Form(
+                key: _formkey,
+                child: TextFormField(
+                  controller: _link,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return "Url required";
+                    }
+                  },
+                  decoration: InputDecoration(
+                    suffixIcon: Padding(
+                      padding: const EdgeInsets.only(right: 4.0),
+                      child: Obx(() {
+                        return controller.isLoading.value
+                            ? SizedBox(child: SpinKitThreeBounce(
+                          color: currentPlateForm['buttonColor'] ??
+                              const Color(0xff9369DF), // apne button color se match kar lo
+                          size: 20,
+                        ))
+                            : GestureDetector(
+                                onTap: () async {
+                                  if (_formkey.currentState!.validate()) {
+                                    final url = _link.text.trim();
+                                    if (url.isNotEmpty) {
+                                      controller.isLoading.value = true;
+
+                                      await controller.VideoDownloadApi(url);
+
+                                      controller.isLoading.value = false;
+                                    }
+                                  } else {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text("Enter Url"),
+                                      ),
+                                    );
+                                  }
+                                },
+                                child: Container(
+                                  width: width * 0.15,
+                                  height: height * 0.01,
+                                  decoration: BoxDecoration(
+                                    color:
+                                        currentPlateForm['buttonColor'] ??
+                                        const Color(0xff9369DF),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  padding: const EdgeInsets.all(6),
+                                  child: Image.asset(AppIcons.arrow),
+                                ),
+                              );
+                      }),
                     ),
-                  ),
-                  hintText: 'Paste url here',
-                  hintStyle: const TextStyle(
-                    color: Color(0xFF000066),
-                    fontSize: 16,
-                    fontFamily: 'Montserrat',
-                    fontWeight: FontWeight.w500,
-                  ),
-                  filled: true,
-                  fillColor: Colors.white,
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: const BorderSide(color: Colors.white),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(
-                      color: const Color(0xff2684FF),
-                      width: 2,
+                    hintText: 'Paste url here',
+                    hintStyle: const TextStyle(
+                      color: Color(0xFF000066),
+                      fontSize: 16,
+                      fontFamily: 'Montserrat',
+                      fontWeight: FontWeight.w500,
+                    ),
+                    filled: true,
+                    fillColor: Colors.white,
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: const BorderSide(color: Colors.white),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(
+                        color: const Color(0xff2684FF),
+                        width: 2,
+                      ),
                     ),
                   ),
                 ),
@@ -158,12 +206,15 @@ class HomeScreenState extends State<HomeScreen> {
                 SizedBox(width: width * 0.05),
                 GestureDetector(
                   onTap: () async {
+                    _link.clear();
+                    controller.thumbnail.value = "";
+                    controller.downloadUrl.value ="";
                     debugPrint("Navigating to View all");
                     final selectedPlatform = await Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (_) =>
-                        const MyBottomNavigationBar(initialIndex: 1),
+                            const MyBottomNavigationBar(initialIndex: 1),
                       ),
                     );
                     if (selectedPlatform != null) {
@@ -198,55 +249,109 @@ class HomeScreenState extends State<HomeScreen> {
 
             SizedBox(height: height * 0.02),
 
-            Container(
-              width: width * 0.9,
-              height: height * 0.39,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Stack(
-                children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(10),
-                    child: Image.asset(
-                      AppImages.downloadVideoImage,
-                      fit: BoxFit.cover,
-                      width: double.infinity,
-                      errorBuilder: (context, error, stackTrace) =>
-                      const Icon(Icons.error),
-                    ),
+            Obx((){
+              final downloading = controller.isDownloading.value;
+              return Container(
+                  width: width * 0.9,
+                  height: height * 0.39,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                  Positioned(
-                    bottom: 54,
-                    left: 10,
-                    right: 10,
-                    child: Button(
-                      color: currentPlateForm['buttonColor'] ??
-                          const Color(0xff9369DF),
-                      text: const Text(
-                        'Download',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
+                  child: controller.thumbnail.value.isNotEmpty
+                      ? Stack(
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: Image.network(
+                          controller.thumbnail.value,
+                          fit: BoxFit.cover,
+                          width: double.infinity,
+                          errorBuilder: (context, error, stackTrace) =>
+                          const Icon(Icons.error),
                         ),
                       ),
-                    ),
-                  ),
-                  const Positioned(
-                    bottom: 0.1,
-                    left: 10,
-                    right: 10,
-                    child: Button(
-                      color: Colors.white,
-                      text: Text(
-                        'Share',
-                        style: TextStyle(fontWeight: FontWeight.bold),
+
+                      Positioned(
+                        bottom: 65,
+                        left: 10,
+                        right: 10,
+                        child:
+
+                        GestureDetector(
+                          onTap: () async {
+                            final url = controller.downloadUrl.value;
+                            if (url.isNotEmpty) {
+                              // yahan apko actual download method call karna chahiye
+                              await controller.downloadVideo(url, "myvide");
+
+                            } else {
+                              Get.snackbar("Error", "Download URL not found!");
+                            }
+                          },
+                          child: Button(
+                            color:
+                                currentPlateForm['buttonColor'],
+                            text: Text(
+                              downloading ? "Downloading..." : "Download",
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
                       ),
-                    ),
+
+                      Positioned(
+                        bottom: 10,
+                        left: 10,
+                        right: 10,
+                        child: GestureDetector(
+                          onTap: () {
+                            final url = controller.downloadUrl.value;
+                            if (url.isNotEmpty) {
+                              Share.share(
+                                "🎬 Check out this video:\n$url",
+                                subject: "Video Download Link",
+                              );
+                            } else {
+                              Get.snackbar("Error", "No download link found!");
+                            }
+                          },
+                          child: Button(
+                            color: Colors.white,
+                            text: const Text(
+                              'Share',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ),
+                      ),
+
+
+                    ],
+                  )
+                      : Column(
+
+                    children: [
+                      SizedBox(height: 12,),
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: Image.asset(
+                          AppImages.HowToDownload,
+                          fit: BoxFit.cover,
+                          width: double.infinity,
+                          errorBuilder: (context, error, stackTrace) =>
+                          const Icon(Icons.error),
+                        ),
+                      ),
+                      SizedBox(height: 12,),
+                    ],
                   ),
-                ],
-              ),
+                );
+
+              }
             ),
           ],
         ),
@@ -255,9 +360,17 @@ class HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildPlatformIcon(
-      double width, double height, int index, String iconPath) {
+
+    double width,
+    double height,
+    int index,
+    String iconPath,
+  ) {
     return GestureDetector(
       onTap: () {
+        _link.clear();
+        controller.thumbnail.value = "";
+        controller.downloadUrl.value ="";
         setState(() {
           selectedIndex = index;
           currentPlateForm = PlateFormData.plateForms[selectedIndex];
@@ -266,8 +379,7 @@ class HomeScreenState extends State<HomeScreen> {
       child: Image.asset(
         iconPath,
         height: height * 0.09,
-        errorBuilder: (context, error, stackTrace) =>
-        const Icon(Icons.error),
+        errorBuilder: (context, error, stackTrace) => const Icon(Icons.error),
       ),
     );
   }

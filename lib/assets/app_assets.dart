@@ -61,6 +61,7 @@ class AppImages {
   static const splashImage = '${baseIconPath}splash_image.png';
   static const noHistoryImage = '${baseIconPath}NoHistoryImage.png';
   static const proImage = '${baseIconPath}ProImage.png';
+  static const HowToDownload = '${baseIconPath}how_to_Download.png';
   static const downloadVideoImage = '${baseIconPath}Download_Video_Image.png';
   static const backgroundRemover = '${baseIconPath}Background-Remover.png';
 }

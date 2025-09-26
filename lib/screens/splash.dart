@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:linear_progress_bar/linear_progress_bar.dart';
 import 'package:qaisar/assets/app_assets.dart';
+import 'package:qaisar/screens/home_screen.dart';
 import 'package:qaisar/screens/splash_screen.dart';
+
+import 'bottom_navigation_bar/my_bottom_navigation_bar.dart';
 
 class Splash extends StatefulWidget {
   const Splash({super.key});
@@ -37,7 +40,7 @@ class _SplashState extends State<Splash> {
   void _navigateToSplashScreen() {
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (_) => const SplashScreen()),
+      MaterialPageRoute(builder: (_) => MyBottomNavigationBar()),
     );
   }
 
