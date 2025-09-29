@@ -1,97 +1,136 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:dio/dio.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
+import 'package:image_gallery_saver_plus/image_gallery_saver_plus.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class VideoDownloaderService extends GetxController {
   var thumbnail = "".obs;
   var downloadUrl = "".obs;
   var isLoading = false.obs;
   var isDownloading = false.obs;
+
   final baseUrl = dotenv.env['API_BASE_URL'] ?? "";
 
+  Future<bool> requestStoragePermission() async {
+    if (Platform.isAndroid) {
+      if (await Permission.storage.isGranted) return true;
+      if (await Permission.storage.request().isGranted) return true;
+
+      // Android 13+
+      if (await Permission.videos.request().isGranted) return true;
+      if (await Permission.photos.request().isGranted) return true;
+    }
+    return false;
+  }
+
   Future<void> VideoDownloadApi(String videoLink) async {
-    final url = Uri.parse(baseUrl);
-    print(baseUrl);
+    final url = Uri.parse('$baseUrl/api/video/universal');
     final payload = jsonEncode({"url": videoLink});
     final header = {"Content-Type": "application/json"};
 
     try {
       final response = await http.post(url, body: payload, headers: header);
-      if (response.statusCode == 200) {
-        print("Succes fully download");
-        // Get.snackbar(
-        //   "Success",
-        //   " Download ready:",
-        //   backgroundColor: Colors.green.withOpacity(0.7),
-        //   colorText: Colors.white,
-        // );
 
-        // final data = jsonDecode(response.body);
+      if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
 
-        // Nested object "data"
-        final videoData = responseData['data'] ?? {};
+        if (responseData['success'] == true) {
+          final videoData = responseData['data'] ?? {};
 
-        final title = videoData['title'] ?? 'Unknown';
-        final duration = videoData['duration'] ?? 0;
-        thumbnail.value = videoData['thumbnail'] ?? '';
-        final uploader = videoData['uploader'] ?? 'Unknown';
-        downloadUrl.value = videoData['url'] ?? '';
-
-        print("🎬 Title: $title");
-        print("⏱ Duration: $duration");
-        print("👤 Uploader: $uploader");
-        print("🖼 Thumbnail: $thumbnail");
-        print("🔗 Download URL: $downloadUrl");
+          thumbnail.value = videoData['thumbnail'] ?? '';
+          downloadUrl.value = videoData['url'] ?? '';
+        } else {
+          Get.snackbar(
+              "Error", responseData['message'] ?? "Failed to process video");
+        }
       } else {
-        print("Failed ${response.statusCode}-- ${response.body}");
-        // Get.snackbar(
-        //   backgroundColor: Colors.red.withOpacity(0.7),
-        //   colorText: Colors.white,
-        //   "Error",
-        //   "⚠️Service temporarily unavailable. Please try again later.",
-        // );
+        final errorData = jsonDecode(response.body);
+        Get.snackbar("Error", errorData['message'] ?? "Service unavailable");
       }
     } catch (e) {
-      print("⚠️ Error: $e");
+      Get.snackbar("Error", "Network error occurred");
     }
   }
 
-  // ye function video download karega
-
   Future<void> downloadVideo(String url, String title) async {
-    try {
-      isDownloading.value = true; // start download
+    if (!await requestStoragePermission()) {
+      Get.snackbar("Permission", "Storage permission denied");
+      return;
+    }
 
-      Directory appDocDir = await getApplicationDocumentsDirectory();
-      String savePath = "${appDocDir.path}/$title.mp4";
+    try {
+      Directory downloadsDir = Directory("/storage/emulated/0/Download");
+      if (!downloadsDir.existsSync()) {
+        downloadsDir = await getExternalStorageDirectory() ??
+            await getApplicationDocumentsDirectory();
+      }
+
+      String savePath = "${downloadsDir.path}/$title.mp4";
+
+      await Dio().download(url, savePath);
+      print("Downloaded to: $savePath");
+
+      final result =
+          await ImageGallerySaverPlus.saveFile(savePath, name: title);
+      print("Saved to Gallery: $result");
+
+      Get.snackbar("Success", "Video saved to Gallery");
+    } catch (e) {
+      print("Download error: $e");
+      Get.snackbar("Error", "Download failed: $e");
+    }
+  }
+
+  Future<void> downloadDirectUrl(String videoUrl, String title) async {
+    if (videoUrl.isEmpty) {
+      Get.snackbar("Error", "Video URL not available");
+      return;
+    }
+
+    if (!await requestStoragePermission()) {
+      Get.snackbar("Permission", "Storage permission denied");
+      return;
+    }
+
+    try {
+      isDownloading.value = true;
+
+      Directory downloadsDir = Directory("/storage/emulated/0/Download");
+      if (!downloadsDir.existsSync()) {
+        downloadsDir = await getExternalStorageDirectory() ??
+            await getApplicationDocumentsDirectory();
+      }
+
+      String savePath = "${downloadsDir.path}/$title.mp4";
 
       Dio dio = Dio();
 
       await dio.download(
-        url,
+        videoUrl,
         savePath,
         onReceiveProgress: (received, total) {
           if (total != -1) {
-            print(
-              "Downloading: ${(received / total * 100).toStringAsFixed(0)}%",
-            );
+            double progress = (received / total * 100);
+            print("Download Progress: $progress%");
           }
         },
       );
 
-      print("✅ Downloaded to: $savePath");
-      Get.snackbar("Download Complete", "Saved at $savePath");
+      final result =
+          await ImageGallerySaverPlus.saveFile(savePath, name: title);
+      print("Saved to Gallery: $result");
+
+      Get.snackbar("Success", "Video downloaded successfully");
     } catch (e) {
-      print("⚠️ Download Error: $e");
-      Get.snackbar("Error", "Failed to download video");
+      print("Direct download error: $e");
+      Get.snackbar("Error", "Direct download failed: $e");
     } finally {
-      isDownloading.value = false; // end download
+      isDownloading.value = false;
     }
   }
 }

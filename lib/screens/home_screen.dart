@@ -20,18 +20,13 @@ class HomeScreen extends StatefulWidget {
 }
 
 class HomeScreenState extends State<HomeScreen> {
-
   final controller = Get.find<VideoDownloaderService>();
-
   final _formkey = GlobalKey<FormState>();
-  bool _isloading = false;
-  // VideoDownloaderService _videoDownloaderService = VideoDownloaderService();
   int selectedIndex = 0;
   TextEditingController _link = TextEditingController();
   late Map<String, dynamic> currentPlateForm;
 
   void updatePlatform(Map<String, dynamic> platform) {
-    debugPrint("Updating platform: $platform");
     setState(() {
       currentPlateForm = Map<String, dynamic>.from(platform);
     });
@@ -40,15 +35,13 @@ class HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    currentPlateForm =
-        widget.selectedPlatform ??
+    currentPlateForm = widget.selectedPlatform ??
         {
           "title": "Any Video Downloader",
           "subtitle": "Download Video From Any Platform",
           "icon": AppIcons.downloadIcon,
           "buttonColor": const Color(0xff9369DF),
         };
-    debugPrint("Initial platform: $currentPlateForm");
   }
 
   @override
@@ -62,8 +55,6 @@ class HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-   // final controller = Get.find<VideoDownloaderService>();
-    print(controller.thumbnail.value);
     final width = MediaQuery.of(context).size.width;
     final height = MediaQuery.of(context).size.height;
 
@@ -93,13 +84,11 @@ class HomeScreenState extends State<HomeScreen> {
                   const Icon(Icons.error),
             ),
             SizedBox(height: height * 0.01),
-
             Text(
               currentPlateForm['title'] ?? 'Download Any Video',
               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
             ),
             SizedBox(height: height * 0.01),
-
             Text(
               currentPlateForm['subtitle'] ??
                   'Download Video From Any Platform',
@@ -109,9 +98,7 @@ class HomeScreenState extends State<HomeScreen> {
                 fontWeight: FontWeight.w500,
               ),
             ),
-
             SizedBox(height: height * 0.02),
-
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12.0),
               child: Form(
@@ -122,42 +109,36 @@ class HomeScreenState extends State<HomeScreen> {
                     if (value == null || value.isEmpty) {
                       return "Url required";
                     }
+                    return null;
                   },
                   decoration: InputDecoration(
                     suffixIcon: Padding(
                       padding: const EdgeInsets.only(right: 4.0),
                       child: Obx(() {
                         return controller.isLoading.value
-                            ? SizedBox(child: SpinKitThreeBounce(
-                          color: currentPlateForm['buttonColor'] ??
-                              const Color(0xff9369DF), // apne button color se match kar lo
-                          size: 20,
-                        ))
+                            ? SizedBox(
+                                child: SpinKitThreeBounce(
+                                  color: currentPlateForm['buttonColor'] ??
+                                      const Color(0xff9369DF),
+                                  size: 20,
+                                ),
+                              )
                             : GestureDetector(
                                 onTap: () async {
                                   if (_formkey.currentState!.validate()) {
                                     final url = _link.text.trim();
                                     if (url.isNotEmpty) {
                                       controller.isLoading.value = true;
-
                                       await controller.VideoDownloadApi(url);
-
                                       controller.isLoading.value = false;
                                     }
-                                  } else {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text("Enter Url"),
-                                      ),
-                                    );
                                   }
                                 },
                                 child: Container(
                                   width: width * 0.15,
                                   height: height * 0.01,
                                   decoration: BoxDecoration(
-                                    color:
-                                        currentPlateForm['buttonColor'] ??
+                                    color: currentPlateForm['buttonColor'] ??
                                         const Color(0xff9369DF),
                                     borderRadius: BorderRadius.circular(8),
                                   ),
@@ -182,8 +163,8 @@ class HomeScreenState extends State<HomeScreen> {
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(
-                        color: const Color(0xff2684FF),
+                      borderSide: const BorderSide(
+                        color: Color(0xff2684FF),
                         width: 2,
                       ),
                     ),
@@ -191,10 +172,7 @@ class HomeScreenState extends State<HomeScreen> {
                 ),
               ),
             ),
-
             SizedBox(height: height * 0.02),
-
-            // Platforms row
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -206,10 +184,7 @@ class HomeScreenState extends State<HomeScreen> {
                 SizedBox(width: width * 0.05),
                 GestureDetector(
                   onTap: () async {
-                    _link.clear();
-                    controller.thumbnail.value = "";
-                    controller.downloadUrl.value ="";
-                    debugPrint("Navigating to View all");
+                    _clearData();
                     final selectedPlatform = await Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -228,9 +203,9 @@ class HomeScreenState extends State<HomeScreen> {
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(50),
                     ),
-                    child: Column(
+                    child: const Column(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      children: const [
+                      children: [
                         Icon(Icons.arrow_forward_ios_sharp, size: 18),
                         Text(
                           'View all',
@@ -246,113 +221,107 @@ class HomeScreenState extends State<HomeScreen> {
                 ),
               ],
             ),
-
             SizedBox(height: height * 0.02),
-
-            Obx((){
+            Obx(() {
               final downloading = controller.isDownloading.value;
               return Container(
-                  width: width * 0.9,
-                  height: height * 0.39,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: controller.thumbnail.value.isNotEmpty
-                      ? Stack(
-                    children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(10),
-                        child: Image.network(
-                          controller.thumbnail.value,
-                          fit: BoxFit.cover,
-                          width: double.infinity,
-                          errorBuilder: (context, error, stackTrace) =>
-                          const Icon(Icons.error),
-                        ),
-                      ),
+                width: width * 0.9,
+                height: height * 0.39,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: controller.thumbnail.value.isNotEmpty
+                    ? Stack(
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(10),
+                            child: Image.network(
+                              controller.thumbnail.value,
+                              fit: BoxFit.cover,
+                              width: double.infinity,
+                              errorBuilder: (context, error, stackTrace) =>
+                                  const Icon(Icons.error),
+                            ),
+                          ),
+                          Positioned(
+                            bottom: 65,
+                            left: 10,
+                            right: 10,
+                            child: GestureDetector(
+                              onTap: () async {
+                                final originalUrl = _link.text.trim();
+                                final directUrl = controller.downloadUrl.value;
 
-                      Positioned(
-                        bottom: 65,
-                        left: 10,
-                        right: 10,
-                        child:
-
-                        GestureDetector(
-                          onTap: () async {
-                            final url = controller.downloadUrl.value;
-                            if (url.isNotEmpty) {
-                              // yahan apko actual download method call karna chahiye
-                              await controller.downloadVideo(url, "myvide");
-
-                            } else {
-                              Get.snackbar("Error", "Download URL not found!");
-                            }
-                          },
-                          child: Button(
-                            color:
-                                currentPlateForm['buttonColor'],
-                            text: Text(
-                              downloading ? "Downloading..." : "Download",
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
+                                if (originalUrl.isNotEmpty) {
+                                  if (directUrl.isNotEmpty) {
+                                    await controller.downloadDirectUrl(
+                                        directUrl, "video");
+                                  } else {
+                                    await controller.downloadVideo(
+                                        originalUrl, "video");
+                                  }
+                                } else {
+                                  Get.snackbar("Error", "URL not found!");
+                                }
+                              },
+                              child: Button(
+                                color: currentPlateForm['buttonColor'],
+                                text: Text(
+                                  downloading ? "Downloading..." : "Download",
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                      ),
-
-                      Positioned(
-                        bottom: 10,
-                        left: 10,
-                        right: 10,
-                        child: GestureDetector(
-                          onTap: () {
-                            final url = controller.downloadUrl.value;
-                            if (url.isNotEmpty) {
-                              Share.share(
-                                "🎬 Check out this video:\n$url",
-                                subject: "Video Download Link",
-                              );
-                            } else {
-                              Get.snackbar("Error", "No download link found!");
-                            }
-                          },
-                          child: Button(
-                            color: Colors.white,
-                            text: const Text(
-                              'Share',
-                              style: TextStyle(fontWeight: FontWeight.bold),
+                          Positioned(
+                            bottom: 10,
+                            left: 10,
+                            right: 10,
+                            child: GestureDetector(
+                              onTap: () {
+                                final url = _link.text.trim();
+                                if (url.isNotEmpty) {
+                                  Share.share(
+                                    "Check out this video:\n$url",
+                                    subject: "Video Download Link",
+                                  );
+                                } else {
+                                  Get.snackbar("Error", "No link found!");
+                                }
+                              },
+                              child: const Button(
+                                color: Colors.white,
+                                text: Text(
+                                  'Share',
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                              ),
                             ),
                           ),
-                        ),
+                        ],
+                      )
+                    : Column(
+                        children: [
+                          const SizedBox(height: 12),
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(10),
+                            child: Image.asset(
+                              AppImages.HowToDownload,
+                              fit: BoxFit.cover,
+                              width: double.infinity,
+                              errorBuilder: (context, error, stackTrace) =>
+                                  const Icon(Icons.error),
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                        ],
                       ),
-
-
-                    ],
-                  )
-                      : Column(
-
-                    children: [
-                      SizedBox(height: 12,),
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(10),
-                        child: Image.asset(
-                          AppImages.HowToDownload,
-                          fit: BoxFit.cover,
-                          width: double.infinity,
-                          errorBuilder: (context, error, stackTrace) =>
-                          const Icon(Icons.error),
-                        ),
-                      ),
-                      SizedBox(height: 12,),
-                    ],
-                  ),
-                );
-
-              }
-            ),
+              );
+            }),
           ],
         ),
       ),
@@ -360,7 +329,6 @@ class HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildPlatformIcon(
-
     double width,
     double height,
     int index,
@@ -368,9 +336,7 @@ class HomeScreenState extends State<HomeScreen> {
   ) {
     return GestureDetector(
       onTap: () {
-        _link.clear();
-        controller.thumbnail.value = "";
-        controller.downloadUrl.value ="";
+        _clearData();
         setState(() {
           selectedIndex = index;
           currentPlateForm = PlateFormData.plateForms[selectedIndex];
@@ -382,5 +348,11 @@ class HomeScreenState extends State<HomeScreen> {
         errorBuilder: (context, error, stackTrace) => const Icon(Icons.error),
       ),
     );
+  }
+
+  void _clearData() {
+    _link.clear();
+    controller.thumbnail.value = "";
+    controller.downloadUrl.value = "";
   }
 }
