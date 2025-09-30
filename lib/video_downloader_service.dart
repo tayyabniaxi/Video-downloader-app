@@ -7,12 +7,15 @@ import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import 'package:image_gallery_saver_plus/image_gallery_saver_plus.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:video_player/video_player.dart';
 
 class VideoDownloaderService extends GetxController {
   var thumbnail = "".obs;
   var downloadUrl = "".obs;
+  var OriginalUrl = "".obs;
   var isLoading = false.obs;
   var isDownloading = false.obs;
+  var progress = 0.0.obs; // 👈 progress store karega
 
   final baseUrl = dotenv.env['API_BASE_URL'] ?? "";
 
@@ -44,9 +47,13 @@ class VideoDownloaderService extends GetxController {
 
           thumbnail.value = videoData['thumbnail'] ?? '';
           downloadUrl.value = videoData['url'] ?? '';
+          OriginalUrl.value = videoData['originalUrl'] ?? '';
+
         } else {
           Get.snackbar(
-              "Error", responseData['message'] ?? "Failed to process video");
+            "Error",
+            responseData['message'] ?? "Failed to process video",
+          );
         }
       } else {
         final errorData = jsonDecode(response.body);
@@ -66,7 +73,8 @@ class VideoDownloaderService extends GetxController {
     try {
       Directory downloadsDir = Directory("/storage/emulated/0/Download");
       if (!downloadsDir.existsSync()) {
-        downloadsDir = await getExternalStorageDirectory() ??
+        downloadsDir =
+            await getExternalStorageDirectory() ??
             await getApplicationDocumentsDirectory();
       }
 
@@ -75,8 +83,10 @@ class VideoDownloaderService extends GetxController {
       await Dio().download(url, savePath);
       print("Downloaded to: $savePath");
 
-      final result =
-          await ImageGallerySaverPlus.saveFile(savePath, name: title);
+      final result = await ImageGallerySaverPlus.saveFile(
+        savePath,
+        name: title,
+      );
       print("Saved to Gallery: $result");
 
       Get.snackbar("Success", "Video saved to Gallery");
@@ -102,7 +112,8 @@ class VideoDownloaderService extends GetxController {
 
       Directory downloadsDir = Directory("/storage/emulated/0/Download");
       if (!downloadsDir.existsSync()) {
-        downloadsDir = await getExternalStorageDirectory() ??
+        downloadsDir =
+            await getExternalStorageDirectory() ??
             await getApplicationDocumentsDirectory();
       }
 
@@ -115,14 +126,17 @@ class VideoDownloaderService extends GetxController {
         savePath,
         onReceiveProgress: (received, total) {
           if (total != -1) {
-            double progress = (received / total * 100);
+            progress.value = (received / total) * 100;
+            //double progress = (received / total * 100);
             print("Download Progress: $progress%");
           }
         },
       );
 
-      final result =
-          await ImageGallerySaverPlus.saveFile(savePath, name: title);
+      final result = await ImageGallerySaverPlus.saveFile(
+        savePath,
+        name: title,
+      );
       print("Saved to Gallery: $result");
 
       Get.snackbar("Success", "Video downloaded successfully");
@@ -132,5 +146,22 @@ class VideoDownloaderService extends GetxController {
     } finally {
       isDownloading.value = false;
     }
+  }
+
+  late VideoPlayerController videoController;
+  RxBool isVideoInitialized = false.obs;
+
+  void initVideo(String url) {
+    videoController = VideoPlayerController.networkUrl(Uri.parse(url))
+      ..initialize().then((_) {
+        isVideoInitialized.value = true;
+        update();
+      });
+  }
+
+  @override
+  void onClose() {
+    videoController.dispose();
+    super.onClose();
   }
 }

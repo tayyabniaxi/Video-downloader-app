@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:linear_progress_bar/linear_progress_bar.dart';
 import 'package:qaisar/assets/app_assets.dart';
 import 'package:qaisar/screens/home_screen.dart';
+import 'package:qaisar/screens/onboard_process.dart';
 import 'package:qaisar/screens/splash_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'bottom_navigation_bar/my_bottom_navigation_bar.dart';
 
@@ -23,24 +25,50 @@ class _SplashState extends State<Splash> {
     _startProgress();
   }
 
-  void _startProgress() {
-    // Fill the progress bar over 3 seconds
-    Future.delayed(const Duration(milliseconds: 100), () {
-      if (mounted && currentStep < maxSteps) {
-        setState(() {
-          currentStep++;
-        });
-        _startProgress();
-      } else {
-        _navigateToSplashScreen();
-      }
-    });
+  //
+  // void initState() {
+  //   super.initState();
+  //   Timer(const Duration(seconds: 2), () async {
+  //     final prefs = await SharedPreferences.getInstance();
+  //     bool seenOnboarding = prefs.getBool("seenOnboarding") ?? false;
+  //
+  //     if (seenOnboarding) {
+  //       Get.offAllNamed("/home");
+  //     } else {
+  //       Get.offAllNamed("/onboarding");
+  //     }
+  //   });
+  // }
+
+  void _startProgress() async {
+    final prefs = await SharedPreferences.getInstance();
+    bool seenOnboarding = prefs.getBool("seenOnboarding") ?? false;
+
+    if (!seenOnboarding) {
+      // User has NOT seen onboarding
+      Future.delayed(const Duration(milliseconds: 100), () {
+        if (mounted && currentStep < maxSteps) {
+          setState(() {
+            currentStep++;
+          });
+          _startProgress(); // keep progressing
+        } else {
+          // When onboarding finishes → mark as seen
+          prefs.setBool("seenOnboarding", true);
+         Navigator.push(context, MaterialPageRoute(builder: (_)=>HomeScreen())); // or Splash -> Home
+        }
+      });
+    } else {
+      // Already seen → skip onboarding
+      _navigateToSplashScreen();
+    }
   }
+
 
   void _navigateToSplashScreen() {
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (_) => MyBottomNavigationBar()),
+      MaterialPageRoute(builder: (_) => OnboardingScreen()),
     );
   }
 

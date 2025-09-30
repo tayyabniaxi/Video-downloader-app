@@ -2,15 +2,18 @@ import 'package:flutter/material.dart';
 
 class CustomTextField extends StatelessWidget {
   final String hintText;
+  final TextEditingController? url;
 
   const CustomTextField({
     super.key,
-    required this.hintText
+    required this.hintText,
+     this.url
   });
 
   @override
   Widget build(BuildContext context) {
     return TextField(
+      controller: url,
       decoration: InputDecoration(
         fillColor: Colors.white,
         filled: true,

@@ -1,6 +1,9 @@
 class AppIcons {
   static const baseIconPath = 'assets/icons/';
   static const arrowIcon = '${baseIconPath}arrow.png';
+  static const fb1 = '${baseIconPath}facebook1.png';
+  static const insta1 = '${baseIconPath}insta1.png';
+  static const yt1 = '${baseIconPath}yt1.png';
   static const arrow = '${baseIconPath}arrowIcon.png';
   static const downloadIcon = '${baseIconPath}download_icon.png';
   static const facebookLoginIcon = '${baseIconPath}Facebook_login.png';
@@ -9,8 +12,8 @@ class AppIcons {
   static const homeIcon = '${baseIconPath}home.png';
   static const plateFormIcon = '${baseIconPath}plateForm.png';
   static const tools = '${baseIconPath}tools.png';
-  static const youTube = '${baseIconPath}Youtube-Icon.png';
-  static const instagram = '${baseIconPath}instagram.png';
+  static const youTube = '${baseIconPath}Icon.png';
+  static const instagram = '${baseIconPath}insta.png';
   static const facebook = '${baseIconPath}Facebook.png';
   static const arte = '${baseIconPath}Arte.png';
   static const bbcIcon = '${baseIconPath}BBC_IPlayer.png';
@@ -50,6 +53,9 @@ class AppIcons {
   static const historyPicture = '${baseIconPath}HistoryPicture.png';
   static const uploadIcon = '${baseIconPath}uploadIcon.png';
   static const iconLink = '${baseIconPath}IconLink.png';
+  // static const onBoard1 = '${baseIconPath}onboarding1.png';
+  // static const onBoard2 = '${baseIconPath}onboarding2.png';
+  // static const onBoard3 = '${baseIconPath}onboarding3.png';
 }
 
 
@@ -64,4 +70,7 @@ class AppImages {
   static const HowToDownload = '${baseIconPath}how_to_Download.png';
   static const downloadVideoImage = '${baseIconPath}Download_Video_Image.png';
   static const backgroundRemover = '${baseIconPath}Background-Remover.png';
+  static const onBoard1 = '${baseIconPath}onboarding1.png';
+  static const onBoard2 = '${baseIconPath}onboarding2.png';
+  static const onBoard3 = '${baseIconPath}onboarding3.png';
 }

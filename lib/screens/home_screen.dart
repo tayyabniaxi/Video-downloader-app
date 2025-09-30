@@ -6,7 +6,9 @@ import 'package:qaisar/components/button.dart';
 import 'package:qaisar/data/plateform_data.dart';
 import 'package:qaisar/screens/bottom_navigation_bar/my_bottom_navigation_bar.dart';
 import 'package:qaisar/screens/profile_section/profile_section.dart';
+import 'package:qaisar/screens/video_player_screen.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:video_player/video_player.dart'; // Add video_player import
 import '../components/custom_row.dart';
 import '../video_downloader_service.dart';
 
@@ -25,6 +27,8 @@ class HomeScreenState extends State<HomeScreen> {
   int selectedIndex = 0;
   TextEditingController _link = TextEditingController();
   late Map<String, dynamic> currentPlateForm;
+  VideoPlayerController? _videoPlayerController; // Video player controller
+  bool _isVideoInitialized = false;
 
   void updatePlatform(Map<String, dynamic> platform) {
     setState(() {
@@ -32,10 +36,71 @@ class HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  Future<String?> showQualityPopup(BuildContext context) {
+    final qualities = ["144", "360", "720", "1080"];
+
+    return showDialog<String>(
+      context: context,
+      barrierDismissible: true, // tap outside to close
+      builder: (context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                "Select Video Quality",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              IconButton(
+                icon: const Icon(Icons.close),
+                onPressed: () => Navigator.pop(context),
+              ),
+            ],
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: qualities.map((q) {
+              return Container(
+                margin: const EdgeInsets.symmetric(vertical: 6),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  color: Colors.grey.shade100,
+                ),
+                child: ListTile(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  leading: const Text(
+                    "MP4",
+                    style: TextStyle(
+                      color: Colors.purple,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  trailing: Text(
+                    q,
+                    style: const TextStyle(fontWeight: FontWeight.w600),
+                  ),
+                  onTap: () {
+                    Navigator.pop(context, q); // return selected quality
+                  },
+                ),
+              );
+            }).toList(),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   void initState() {
     super.initState();
-    currentPlateForm = widget.selectedPlatform ??
+    currentPlateForm =
+        widget.selectedPlatform ??
         {
           "title": "Any Video Downloader",
           "subtitle": "Download Video From Any Platform",
@@ -53,6 +118,13 @@ class HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  @override
+  void dispose() {
+    _videoPlayerController?.dispose(); // Dispose of video controller
+    super.dispose();
+  }
+  @override
+  // ... (previous imports and code remain unchanged)
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
@@ -118,7 +190,8 @@ class HomeScreenState extends State<HomeScreen> {
                         return controller.isLoading.value
                             ? SizedBox(
                                 child: SpinKitThreeBounce(
-                                  color: currentPlateForm['buttonColor'] ??
+                                  color:
+                                      currentPlateForm['buttonColor'] ??
                                       const Color(0xff9369DF),
                                   size: 20,
                                 ),
@@ -131,6 +204,14 @@ class HomeScreenState extends State<HomeScreen> {
                                       controller.isLoading.value = true;
                                       await controller.VideoDownloadApi(url);
                                       controller.isLoading.value = false;
+                                      if (controller
+                                          .downloadUrl
+                                          .value
+                                          .isNotEmpty) {
+                                        // _initializeVideoPlayer(
+                                        //   controller.OriginalUrl.value,
+                                        // );
+                                      }
                                     }
                                   }
                                 },
@@ -138,7 +219,8 @@ class HomeScreenState extends State<HomeScreen> {
                                   width: width * 0.15,
                                   height: height * 0.01,
                                   decoration: BoxDecoration(
-                                    color: currentPlateForm['buttonColor'] ??
+                                    color:
+                                        currentPlateForm['buttonColor'] ??
                                         const Color(0xff9369DF),
                                     borderRadius: BorderRadius.circular(8),
                                   ),
@@ -222,112 +304,185 @@ class HomeScreenState extends State<HomeScreen> {
               ],
             ),
             SizedBox(height: height * 0.02),
-            Obx(() {
-              final downloading = controller.isDownloading.value;
-              return Container(
-                width: width * 0.9,
-                height: height * 0.39,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: controller.thumbnail.value.isNotEmpty
-                    ? Stack(
-                        children: [
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(10),
-                            child: Image.network(
-                              controller.thumbnail.value,
-                              fit: BoxFit.cover,
-                              width: double.infinity,
-                              errorBuilder: (context, error, stackTrace) =>
-                                  const Icon(Icons.error),
+            Container(
+              width: width * 0.9,
+              height: height * 0.39,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Obx(() {
+                // Only wrap the thumbnail/video part in Obx
+                if (controller.thumbnail.value.isNotEmpty) {
+                  return Stack(
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          print("Link ${controller.OriginalUrl.value}");
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => BetterPlayerScreen(
+                                videoUrl: controller.OriginalUrl.value,
+                              ),
                             ),
-                          ),
-                          Positioned(
-                            bottom: 65,
-                            left: 10,
-                            right: 10,
-                            child: GestureDetector(
-                              onTap: () async {
-                                final originalUrl = _link.text.trim();
-                                final directUrl = controller.downloadUrl.value;
+                          );
 
-                                if (originalUrl.isNotEmpty) {
-                                  if (directUrl.isNotEmpty) {
-                                    await controller.downloadDirectUrl(
-                                        directUrl, "video");
-                                  } else {
-                                    await controller.downloadVideo(
-                                        originalUrl, "video");
-                                  }
-                                } else {
-                                  Get.snackbar("Error", "URL not found!");
-                                }
-                              },
-                              child: Button(
-                                color: currentPlateForm['buttonColor'],
-                                text: Text(
-                                  downloading ? "Downloading..." : "Download",
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
+                          // if (_isVideoInitialized &&
+                          //     _videoPlayerController != null) {
+                          //   setState(() {
+                          //     _videoPlayerController!.value.isPlaying
+                          //         ? _videoPlayerController!.pause()
+                          //         : _videoPlayerController!.play();
+                          //   });
+                          // }
+                        },
+                        child: GestureDetector(
+                          onTap: () {
+                            print("Link ${controller.OriginalUrl.value}");
+
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) =>
+                                    BetterPlayerScreen(videoUrl: _link.text),
                               ),
-                            ),
-                          ),
-                          Positioned(
-                            bottom: 10,
-                            left: 10,
-                            right: 10,
-                            child: GestureDetector(
-                              onTap: () {
-                                final url = _link.text.trim();
-                                if (url.isNotEmpty) {
-                                  Share.share(
-                                    "Check out this video:\n$url",
-                                    subject: "Video Download Link",
-                                  );
-                                } else {
-                                  Get.snackbar("Error", "No link found!");
-                                }
-                              },
-                              child: const Button(
-                                color: Colors.white,
-                                text: Text(
-                                  'Share',
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      )
-                    : Column(
-                        children: [
-                          const SizedBox(height: 12),
-                          ClipRRect(
+                            );
+                          },
+                          child: ClipRRect(
                             borderRadius: BorderRadius.circular(10),
-                            child: Image.asset(
-                              AppImages.HowToDownload,
-                              fit: BoxFit.cover,
-                              width: double.infinity,
-                              errorBuilder: (context, error, stackTrace) =>
-                                  const Icon(Icons.error),
+                            child:
+                                controller.thumbnail.value.isEmpty
+                                ? Center(child: CircularProgressIndicator())
+                                : Image.network(
+                                    controller.thumbnail.value,
+                                    fit: BoxFit.cover,
+                                    width: double.infinity,
+                                    errorBuilder:
+                                        (context, error, stackTrace) =>
+                                            const Icon(Icons.error),
+                                  ),
+                          ),
+                        ),
+                      ),
+
+                      // Download button with separate Obx
+                      Positioned(
+                        bottom: 65,
+                        left: 10,
+                        right: 10,
+                        child: Obx(() {
+                          final downloading = controller.isDownloading.value;
+                          return GestureDetector(
+                            onTap: () async {
+                              final originalUrl = _link.text.trim();
+                              final directUrl = controller.downloadUrl.value;
+
+                              if (originalUrl.isEmpty) {
+                                Get.snackbar("Error", "URL not found!");
+                                return;
+                              }
+
+                              if (directUrl.isEmpty) {
+                                Get.snackbar("Error", "No direct URL available!");
+                                return;
+                              }
+
+                              // 🔹 Ask user for quality
+                              final selectedQuality = await showQualityPopup(context);
+
+                              if (selectedQuality != null) {
+                                // Pass quality to your download method
+                                await controller.downloadDirectUrl(directUrl, "video_$selectedQuality");
+                                Get.snackbar("Download", "Downloading $selectedQuality quality...");
+                              }
+                            },
+
+                            child: Button(
+                              color: currentPlateForm['buttonColor'],
+                              text: Text(
+                                downloading
+                                    ? "Downloading... ${controller.progress.value.toStringAsFixed(0)}%"
+                                    : "Download",
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          );
+                        }),
+                      ),
+                      // Share button (no Obx needed, as it doesn't depend on reactive variables)
+                      Positioned(
+                        bottom: 10,
+                        left: 10,
+                        right: 10,
+                        child: GestureDetector(
+                          onTap: () {
+                            final url = _link.text.trim();
+                            if (url.isNotEmpty) {
+                              Share.share(
+                                "Check out this video:\n$url",
+                                subject: "Video Download Link",
+                              );
+                            } else {
+                              Get.snackbar("Error", "No link found!");
+                            }
+                          },
+                          child: const Button(
+                            color: Colors.white,
+                            text: Text(
+                              'Share',
+                              style: TextStyle(fontWeight: FontWeight.bold),
                             ),
                           ),
-                          const SizedBox(height: 12),
-                        ],
+                        ),
                       ),
-              );
-            }),
+                      // Positioned(
+                      //   bottom: 90,
+                      //   left:10,
+                      //   right: 10,
+                      //   child: ElevatedButton(
+                      //     onPressed: () async {
+                      //       final result = await showQualityPopup(context);
+                      //       if (result != null) {
+                      //         print("Selected Quality: $result");
+                      //       }
+                      //     },
+                      //     child: Text("Show Popup"),
+                      //   ),
+                      //
+                      // ),
+                    ],
+                  );
+                } else {
+                  return Column(
+                    children: [
+                      const SizedBox(height: 12),
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: Image.asset(
+                          AppImages.HowToDownload,
+                          fit: BoxFit.cover,
+                          width: double.infinity,
+                          errorBuilder: (context, error, stackTrace) =>
+                              const Icon(Icons.error),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                    ],
+                  );
+                }
+              }),
+            ),
           ],
         ),
       ),
     );
   }
 
+  // ... (rest of the code remains unchanged)
   Widget _buildPlatformIcon(
     double width,
     double height,
@@ -354,5 +509,8 @@ class HomeScreenState extends State<HomeScreen> {
     _link.clear();
     controller.thumbnail.value = "";
     controller.downloadUrl.value = "";
+    _videoPlayerController?.dispose(); // Dispose of previous controller
+    _videoPlayerController = null;
+    _isVideoInitialized = false;
   }
 }

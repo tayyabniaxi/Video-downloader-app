@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 class Button extends StatelessWidget {
   final Color color;
-  final Text text;
+  final Widget text;
   final Widget? icon; //  optional icon
   final Color? borderColor;
 
