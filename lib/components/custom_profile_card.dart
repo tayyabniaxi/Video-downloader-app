@@ -24,9 +24,10 @@ class CustomProfileCard extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(text),
-              SizedBox(width: width * 0.43,),
+            //  SizedBox(width: width * 0.43,),
               Text(lastText)
             ],
           ),

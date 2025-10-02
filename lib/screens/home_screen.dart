@@ -36,66 +36,6 @@ class HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  Future<String?> showQualityPopup(BuildContext context) {
-    final qualities = ["144", "360", "720", "1080"];
-
-    return showDialog<String>(
-      context: context,
-      barrierDismissible: true, // tap outside to close
-      builder: (context) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text(
-                "Select Video Quality",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              IconButton(
-                icon: const Icon(Icons.close),
-                onPressed: () => Navigator.pop(context),
-              ),
-            ],
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: qualities.map((q) {
-              return Container(
-                margin: const EdgeInsets.symmetric(vertical: 6),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12),
-                  color: Colors.grey.shade100,
-                ),
-                child: ListTile(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  leading: const Text(
-                    "MP4",
-                    style: TextStyle(
-                      color: Colors.purple,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  trailing: Text(
-                    q,
-                    style: const TextStyle(fontWeight: FontWeight.w600),
-                  ),
-                  onTap: () {
-                    Navigator.pop(context, q); // return selected quality
-                  },
-                ),
-              );
-            }).toList(),
-          ),
-        );
-      },
-    );
-  }
-
   @override
   void initState() {
     super.initState();
@@ -123,6 +63,7 @@ class HomeScreenState extends State<HomeScreen> {
     _videoPlayerController?.dispose(); // Dispose of video controller
     super.dispose();
   }
+
   @override
   // ... (previous imports and code remain unchanged)
   @override
@@ -150,10 +91,13 @@ class HomeScreenState extends State<HomeScreen> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             SizedBox(height: height * 0.03),
-            Image.asset(
-              currentPlateForm['icon'] ?? AppIcons.downloadIcon,
-              errorBuilder: (context, error, stackTrace) =>
-                  const Icon(Icons.error),
+            Container(
+              height: MediaQuery.of(context).size.height*0.09,
+              child: Image.asset(
+                currentPlateForm['icon'] ?? AppIcons.downloadIcon,
+                errorBuilder: (context, error, stackTrace) =>
+                    const Icon(Icons.error),
+              ),
             ),
             SizedBox(height: height * 0.01),
             Text(
@@ -202,7 +146,7 @@ class HomeScreenState extends State<HomeScreen> {
                                     final url = _link.text.trim();
                                     if (url.isNotEmpty) {
                                       controller.isLoading.value = true;
-                                      await controller.VideoDownloadApi(url);
+                                      await controller.videoDownloadApi(url);
                                       controller.isLoading.value = false;
                                       if (controller
                                           .downloadUrl
@@ -230,7 +174,7 @@ class HomeScreenState extends State<HomeScreen> {
                               );
                       }),
                     ),
-                    hintText: 'Paste url here',
+                    hintText: 'Paste Link Here',
                     hintStyle: const TextStyle(
                       color: Color(0xFF000066),
                       fontSize: 16,
@@ -258,11 +202,11 @@ class HomeScreenState extends State<HomeScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                _buildPlatformIcon(width, height, 0, AppIcons.facebook),
+                _buildPlatformIcon(width, height, 0, AppIcons.fb1),
                 SizedBox(width: width * 0.05),
-                _buildPlatformIcon(width, height, 1, AppIcons.youTube),
+                _buildPlatformIcon(width, height, 1, AppIcons.yt1),
                 SizedBox(width: width * 0.05),
-                _buildPlatformIcon(width, height, 2, AppIcons.instagram),
+                _buildPlatformIcon(width, height, 2, AppIcons.insta1),
                 SizedBox(width: width * 0.05),
                 GestureDetector(
                   onTap: () async {
@@ -319,14 +263,15 @@ class HomeScreenState extends State<HomeScreen> {
                       GestureDetector(
                         onTap: () {
                           print("Link ${controller.OriginalUrl.value}");
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => BetterPlayerScreen(
-                                videoUrl: controller.OriginalUrl.value,
-                              ),
-                            ),
-                          );
+                          // Navigator.push(
+                          //   context,
+                          //   MaterialPageRoute(
+                          //     builder: (_) => VideoPage(videoUrl:
+                          //        controller.OriginalUrl.value,
+                          //       //thumbnailUrl: "",
+                          //     ),
+                          //   ),
+                          // );
 
                           // if (_isVideoInitialized &&
                           //     _videoPlayerController != null) {
@@ -341,19 +286,18 @@ class HomeScreenState extends State<HomeScreen> {
                           onTap: () {
                             print("Link ${controller.OriginalUrl.value}");
 
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) =>
-                                    BetterPlayerScreen(videoUrl: _link.text),
-                              ),
-                            );
+                            // Navigator.push(
+                            //   context,
+                            //   MaterialPageRoute(
+                            //     builder: (_) =>
+                            //         VideoPage(videoUrl: _link.text),
+                            //   ),
+                            // );
                           },
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(10),
-                            child:
-                                controller.thumbnail.value.isEmpty
-                                ? Center(child: CircularProgressIndicator())
+                            child: controller.isLoading.value
+                                ? Center(child: SizedBox())
                                 : Image.network(
                                     controller.thumbnail.value,
                                     fit: BoxFit.cover,
@@ -384,18 +328,34 @@ class HomeScreenState extends State<HomeScreen> {
                               }
 
                               if (directUrl.isEmpty) {
-                                Get.snackbar("Error", "No direct URL available!");
+                                Get.snackbar(
+                                  "Error",
+                                  "No direct URL available!",
+                                );
                                 return;
                               }
 
                               // 🔹 Ask user for quality
-                              final selectedQuality = await showQualityPopup(context);
-
-                              if (selectedQuality != null) {
-                                // Pass quality to your download method
-                                await controller.downloadDirectUrl(directUrl, "video_$selectedQuality");
-                                Get.snackbar("Download", "Downloading $selectedQuality quality...");
+                              // final selectedQuality = await showQualityPopup(
+                              //   context,
+                              // );
+                              if (controller.medias.isNotEmpty) {
+                                controller.showQualityDialog();
+                              } else {
+                                controller.downloadDirectUrl(controller.downloadUrl.value, "Default");
+                             //   Get.snackbar("", "No quality options available!");
                               }
+                              // if (selectedQuality != null) {
+                              //   // Pass quality to your download method
+                              //   await controller.videoDownloadApi(
+                              //     directUrl,
+                              //    // "video_$selectedQuality",
+                              //   );
+                              //   Get.snackbar(
+                              //     "Download",
+                              //     "Downloading $selectedQuality quality...",
+                              //   );
+                              // }
                             },
 
                             child: Button(
@@ -458,18 +418,23 @@ class HomeScreenState extends State<HomeScreen> {
                   );
                 } else {
                   return Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       const SizedBox(height: 12),
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(10),
-                        child: Image.asset(
-                          AppImages.HowToDownload,
-                          fit: BoxFit.cover,
-                          width: double.infinity,
-                          errorBuilder: (context, error, stackTrace) =>
-                              const Icon(Icons.error),
-                        ),
-                      ),
+                      Obx(() {
+                        return controller.isLoading.value
+                            ? Center(child: CircularProgressIndicator())
+                            : ClipRRect(
+                                borderRadius: BorderRadius.circular(10),
+                                child: Image.asset(
+                                  AppImages.HowToDownload,
+                                  fit: BoxFit.cover,
+                                  width: double.infinity,
+                                  errorBuilder: (context, error, stackTrace) =>
+                                      const Icon(Icons.error),
+                                ),
+                              );
+                      }),
                       const SizedBox(height: 12),
                     ],
                   );
@@ -497,10 +462,18 @@ class HomeScreenState extends State<HomeScreen> {
           currentPlateForm = PlateFormData.plateForms[selectedIndex];
         });
       },
-      child: Image.asset(
-        iconPath,
-        height: height * 0.09,
-        errorBuilder: (context, error, stackTrace) => const Icon(Icons.error),
+      child: Container(
+        width: 60,
+        height: 60,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          color: Colors.white,
+        ),
+        child: Image.asset(
+          iconPath,
+          height: height * 0.09,
+          errorBuilder: (context, error, stackTrace) => const Icon(Icons.error),
+        ),
       ),
     );
   }

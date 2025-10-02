@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
@@ -31,7 +32,45 @@ class VideoDownloaderService extends GetxController {
     return false;
   }
 
-  Future<void> VideoDownloadApi(String videoLink) async {
+  // Future<void> VideoDownloadApi(String videoLink) async {
+  //   final url = Uri.parse('$baseUrl/api/video/universal');
+  //   final payload = jsonEncode({"url": videoLink});
+  //   final header = {"Content-Type": "application/json"};
+  //
+  //   try {
+  //     final response = await http.post(url, body: payload, headers: header);
+  //
+  //     if (response.statusCode == 200) {
+  //       final responseData = jsonDecode(response.body);
+  //
+  //       if (responseData['success'] == true) {
+  //         print("data::   $responseData");
+  //         final videoData = responseData['data'] ?? {};
+  //
+  //         thumbnail.value = videoData['thumbnail'] ?? '';
+  //         downloadUrl.value = videoData['url'] ?? '';
+  //         OriginalUrl.value = videoData['originalUrl'] ?? '';
+  //         print("data::   $videoData");
+  //       } else {
+  //         Get.snackbar(
+  //           "Error",
+  //           responseData['message'] ?? "Failed to process video",
+  //         );
+  //       }
+  //     } else {
+  //       final errorData = jsonDecode(response.body);
+  //       Get.snackbar("Error", errorData['message'] ?? "Service unavailable");
+  //     }
+  //   } catch (e) {
+  //     Get.snackbar("Error", "Network error occurred");
+  //   }
+  // }
+  //
+
+  var originalUrl = ''.obs;
+  var medias = <Map<String, dynamic>>[].obs; // hold qualities
+
+  Future<void> videoDownloadApi(String videoLink) async {
     final url = Uri.parse('$baseUrl/api/video/universal');
     final payload = jsonEncode({"url": videoLink});
     final header = {"Content-Type": "application/json"};
@@ -47,23 +86,257 @@ class VideoDownloaderService extends GetxController {
 
           thumbnail.value = videoData['thumbnail'] ?? '';
           downloadUrl.value = videoData['url'] ?? '';
-          OriginalUrl.value = videoData['originalUrl'] ?? '';
-
-        } else {
-          Get.snackbar(
-            "Error",
-            responseData['message'] ?? "Failed to process video",
+          originalUrl.value = videoData['originalUrl'] ?? '';
+          medias.value = List<Map<String, dynamic>>.from(
+            videoData['medias'] ?? [],
           );
+
+
+
+          /// Show popup after success
+         // showQualityDialog();
+        } else {
+          // Get.snackbar(
+          //   "Error",
+          //   responseData['message'] ?? "Failed to process video",
+          // );
         }
       } else {
         final errorData = jsonDecode(response.body);
-        Get.snackbar("Error", errorData['message'] ?? "Service unavailable");
+       // Get.snackbar("Error", errorData['message'] ?? "Service unavailable");
       }
     } catch (e) {
-      Get.snackbar("Error", "Network error occurred");
+    //  Get.snackbar("Error", "Network error occurred");
     }
   }
+  final selectedMedia = Rxn<Map<String, dynamic>>();
+  void showQualityDialog() {
+    final selectedMedia = Rxn<Map<String, dynamic>>();
 
+    Get.dialog(
+      Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        insetPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+        backgroundColor: Colors.white,
+        child: Obx(
+              () => Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Title + Close button
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "Select Video Quality",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                      ),
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.close, color: Colors.grey[700]),
+                      onPressed: () => Get.back(),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+
+                // List of qualities
+                ...medias.map(
+                      (m) => Container(
+                    margin: const EdgeInsets.symmetric(vertical: 6),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      color: Colors.grey.shade100,
+                    ),
+                    child: ListTile(
+                      onTap: () => selectedMedia.value = m,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      leading: Text(
+                        "MP4",
+                        style: TextStyle(
+                          color: Colors.purple,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      trailing: Text(
+                        m['label'] ?? "Unknown",
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          color: selectedMedia.value == m
+                              ? Colors.purple
+                              : Colors.black,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 16),
+
+                // Download Button
+                GestureDetector(
+                  onTap: () {
+                    if (selectedMedia.value != null) {
+                      downloadDirectUrl(
+                        selectedMedia.value!['url'],
+                        selectedMedia.value!['label'],
+                      );
+                      Get.back();
+                    } else {
+                    //   Get.snackbar(
+                    //       "Error", "Please select a video quality first");
+                     }
+                  },
+                  child: Container(
+                    width: double.infinity,
+                    height: 48,
+                    decoration: BoxDecoration(
+                      color: Color(0xff726DDE), // purple button
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Center(
+                      child: Text(
+                        "Continue To Download",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+      barrierDismissible: true,
+    );
+  }
+
+//   void showQualityDialog() {
+//
+//     Get.dialog(
+//       // Define a reactive variable to hold selected media
+//
+// // Dialog
+//     AlertDialog(
+//       backgroundColor: Colors.white,
+//       shape: RoundedRectangleBorder(
+//         borderRadius: BorderRadius.circular(16),
+//       ),
+//       title: Row(
+//         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//         children: [
+//           Text(
+//             "Select Video Quality",
+//             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+//           ),
+//           IconButton(
+//             icon: Icon(Icons.close, color: Colors.grey[700]),
+//             onPressed: () => Get.back(),
+//           ),
+//         ],
+//       ),
+//       content: Obx(
+//             () => Column(
+//           mainAxisSize: MainAxisSize.min,
+//           children: [
+//             SizedBox(height: 5),
+//             ...medias.map(
+//                   (m) => Padding(
+//                 padding: const EdgeInsets.all(5.0),
+//                 child: GestureDetector(
+//                   onTap: () {
+//                     // set selected media
+//                     selectedMedia.value = m;
+//                   },
+//                   child: Container(
+//                     height: 50,
+//                     decoration: BoxDecoration(
+//                       borderRadius: BorderRadius.circular(12),
+//                       color: selectedMedia.value == m
+//                           ? Color(0xff726DDE).withOpacity(0.2) // highlight selected
+//                           : Colors.grey.shade100,
+//                     ),
+//                     child: ListTile(
+//                       title: Text(
+//                         m['label'] ?? "Unknown",
+//                         style: TextStyle(fontSize: 12),
+//                       ),
+//                       trailing: Icon(
+//                         selectedMedia.value == m
+//                             ? Icons.check_circle
+//                             : Icons.download,
+//                         color: selectedMedia.value == m
+//                             ? Color(0xff726DDE)
+//                             : Colors.grey,
+//                       ),
+//                     ),
+//                   ),
+//                 ),
+//               ),
+//             ),
+//             SizedBox(height: 15),
+//             Padding(
+//               padding: const EdgeInsets.all(5.0),
+//               child: GestureDetector(
+//                 onTap: () {
+//                   if (selectedMedia.value != null) {
+//                     // download only selected media
+//                     downloadDirectUrl(
+//                       selectedMedia.value!['url'],
+//                       selectedMedia.value!['label'],
+//                     );
+//                     Get.back();
+//                   } else {
+//                     Get.snackbar("Error", "Please select a quality first");
+//                   }
+//                 },
+//                 child: Container(
+//                   width: double.infinity,
+//                   height: 45,
+//                   decoration: BoxDecoration(
+//                     color: Color(0xff726DDE),
+//                     borderRadius: BorderRadius.circular(10),
+//                   ),
+//                   child: Center(
+//                     child: Text(
+//                       "Continue To Download",
+//                       style: TextStyle(
+//                         color: Colors.white,
+//                         fontWeight: FontWeight.bold,
+//                       ),
+//                     ),
+//                   ),
+//                 ),
+//               ),
+//             ),
+//           ],
+//         ),
+//       ),
+//     ),
+//
+//     // barrierDismissible: true,
+//       barrierColor: Colors.black.withOpacity(0.4),
+//       barrierDismissible: true,
+//     );
+//   }
+
+  // void downloadDirectUrl(String url, String quality) {
+  //   // your download implementation here
+  //   Get.snackbar("Download", "Started downloading $quality");
+  // }
+
+  ////
   Future<void> downloadVideo(String url, String title) async {
     if (!await requestStoragePermission()) {
       Get.snackbar("Permission", "Storage permission denied");
@@ -142,7 +415,7 @@ class VideoDownloaderService extends GetxController {
       Get.snackbar("Success", "Video downloaded successfully");
     } catch (e) {
       print("Direct download error: $e");
-      Get.snackbar("Error", "Direct download failed: $e");
+   //   Get.snackbar("Error", "Direct download failed: $e");
     } finally {
       isDownloading.value = false;
     }

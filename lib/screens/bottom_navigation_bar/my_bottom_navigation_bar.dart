@@ -71,7 +71,8 @@ class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> {
       },
       child: Scaffold(
         backgroundColor: const Color(0xffffffff),
-        body: IndexedStack(   //  Keeps state of each page
+        body: IndexedStack(
+          //  Keeps state of each page
           index: _selectedIndex,
           children: pages,
         ),
@@ -88,35 +89,71 @@ class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> {
             unselectedItemColor: Colors.grey,
             items: [
               BottomNavigationBarItem(
-                icon: Image.asset(
-                  AppIcons.homeIcon,
-                  color: _selectedIndex == 0
-                      ? const Color(0xff726DDE)
-                      : Colors.grey,
-                  height: 24,
-                ),
+                icon: _selectedIndex == 0
+                    ? Container(
+                        width: 50,
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade300,
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        height: 30,
+                        child: Image.asset(
+                          AppIcons.homeSelected,
+                          color: Color(0xff726DDE),
+                          height: 24,
+                        ),
+                      )
+                    : Image.asset(
+                        AppIcons.homeIcon,
+                        color: Colors.grey,
+                        height: 24,
+                      ),
                 label: 'Home',
               ),
               BottomNavigationBarItem(
-                icon: Image.asset(
-                  AppIcons.plateFormIcon,
-                  color: _selectedIndex == 1
-                      ? const Color(0xff726DDE)
-                      : Colors.grey,
-                  height: 24,
-                ),
+                icon: _selectedIndex == 1
+                    ? Container(
+                        width: 50,
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade300,
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        height: 30,
+                        child: Image.asset(
+                          AppIcons.platformSelected,
+                          color: Color(0xff726DDE),
+                          height: 24,
+                        ),
+                      )
+                    : Image.asset(
+                        AppIcons.plateFormIcon,
+                        color: Colors.grey,
+                        height: 24,
+                      ),
+                label: 'Platform',
+              ),BottomNavigationBarItem(
+                icon: _selectedIndex == 2
+                    ? Container(
+                        width: 50,
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade300,
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        height: 30,
+                        child: Image.asset(
+                          AppIcons.otherToolsSelected,
+                          color: Color(0xff726DDE),
+                          height: 24,
+                        ),
+                      )
+                    : Image.asset(
+                        AppIcons.tools,
+                        color: Colors.grey,
+                        height: 24,
+                      ),
                 label: 'Platform',
               ),
-              BottomNavigationBarItem(
-                icon: Image.asset(
-                  AppIcons.tools,
-                  color: _selectedIndex == 2
-                      ? const Color(0xff726DDE)
-                      : Colors.grey,
-                  height: 24,
-                ),
-                label: 'Other Tools',
-              ),
+
             ],
           ),
         ),

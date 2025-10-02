@@ -24,7 +24,7 @@ class ToolsGeneratorField extends StatelessWidget {
           SizedBox(height: height * 0.02),
           Container(
             width: 328,
-            height: 300,
+            height: 350,
             decoration: BoxDecoration(
                 color: Color(0xffF5F5F5),
                 borderRadius: BorderRadius.circular(12),

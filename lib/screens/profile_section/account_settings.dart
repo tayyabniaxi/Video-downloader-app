@@ -108,8 +108,8 @@ class _AccountSettingsState extends State<AccountSettings> {
                       ),
                     ),
                     CustomProfileCard(height: height, width: width, text: 'Account Id',lastText: '00000000'),
-                    CustomProfileCard(height: height, width: width * 0.98, text: 'Account Id', lastText: '01/01/2025'),
-                    CustomProfileCard(height: height, width: width * 0.98, text: 'Account Id', lastText: '01/01/2025')
+                    CustomProfileCard(height: height, width: width , text: 'Account Id', lastText: '01/01/2025'),
+                    CustomProfileCard(height: height, width: width , text: 'Account Id', lastText: '01/01/2025')
                   ],
                 ),
               ),

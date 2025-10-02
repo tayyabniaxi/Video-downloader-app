@@ -11,6 +11,8 @@
     <application
         android:label="video_downloader"
         android:name="${applicationName}"
+        android:usesCleartextTraffic="true"
+        android:hardwareAccelerated="true"
         android:icon="@mipmap/ic_launcher"
         android:requestLegacyExternalStorage="true"
 

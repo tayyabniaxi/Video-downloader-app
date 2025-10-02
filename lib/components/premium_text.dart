@@ -18,7 +18,7 @@ class CustomPremium extends StatelessWidget {
           style: const TextStyle(
               fontFamily: 'Montserrat',
               fontWeight: FontWeight.w400,
-              fontSize: 14,
+              fontSize: 10,
               color: Color(0xff646464)),
         )
       ],

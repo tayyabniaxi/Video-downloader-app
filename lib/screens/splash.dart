@@ -22,9 +22,19 @@ class _SplashState extends State<Splash> {
   @override
   void initState() {
     super.initState();
-    _startProgress();
+    _check();
+    _checkFirstSeen();
   }
-
+void _check(){
+  Future.delayed(const Duration(milliseconds: 100), () {
+    if (mounted && currentStep < maxSteps) {
+      setState(() {
+        currentStep++;
+      });
+      _check();
+      // keep progressing
+    }});
+}
   //
   // void initState() {
   //   super.initState();
@@ -40,31 +50,24 @@ class _SplashState extends State<Splash> {
   //   });
   // }
 
-  void _startProgress() async {
+  Future<void> _checkFirstSeen() async {
     final prefs = await SharedPreferences.getInstance();
     bool seenOnboarding = prefs.getBool("seenOnboarding") ?? false;
 
-    if (!seenOnboarding) {
-      // User has NOT seen onboarding
-      Future.delayed(const Duration(milliseconds: 100), () {
-        if (mounted && currentStep < maxSteps) {
-          setState(() {
-            currentStep++;
-          });
-          _startProgress(); // keep progressing
-        } else {
-          // When onboarding finishes → mark as seen
-          prefs.setBool("seenOnboarding", true);
-         Navigator.push(context, MaterialPageRoute(builder: (_)=>HomeScreen())); // or Splash -> Home
-        }
-      });
+    await Future.delayed(const Duration(seconds: 2)); // splash delay
+
+      if (seenOnboarding) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => MyBottomNavigationBar()),
+      );
     } else {
-      // Already seen → skip onboarding
-      _navigateToSplashScreen();
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => OnboardingScreen()),
+      );
     }
   }
-
-
   void _navigateToSplashScreen() {
     Navigator.pushReplacement(
       context,

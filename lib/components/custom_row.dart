@@ -29,6 +29,7 @@ class CustomRow extends StatelessWidget {
           child: Text(
             text,
             style: const TextStyle(
+              fontSize: 20,
               fontFamily: 'Montserrat',
               fontWeight: FontWeight.w600,
             ),

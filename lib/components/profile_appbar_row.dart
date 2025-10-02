@@ -15,15 +15,17 @@ class ProfileAppbarRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
           text,
           style: TextStyle(
+            fontSize: 20,
               fontFamily: 'Montserrat',
               fontWeight: FontWeight.w600,
               color: Colors.black),
         ),
-        SizedBox(width: width * 0.31),
+        SizedBox(width: width * 0.24),
         GestureDetector(
             onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => Premium())),
             child: Image.asset(AppIcons.buttonPro)), // smaller size

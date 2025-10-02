@@ -55,10 +55,18 @@ dependencies:
   better_player_plus: ^1.1.0
   shared_preferences: ^2.3.2
 
+  # Auto-play/pause in feed
+
+
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  youtube_player_flutter: ^9.1.2  # For YouTube videos/Shorts
+  url_launcher: ^6.3.0          # Fallback to open Instagram/Facebook apps
+  visibility_detector: ^0.4.0+2
+  webview_flutter: ^4.7.0
+  flutter_inappwebview: ^6.1.5
 #  build_runner: ^2.4.8
 #  json_serializable: ^6.7.1   # only if you're generating JSON code
 #  freezed: ^2.5.2
@@ -85,6 +93,52 @@ flutter:
   assets:
     - assets/images/
     - assets/icons/
+    - assets/icons/Zee5/Zee5.png
+    - assets/icons/Arte/Arte.png
+    - assets/icons/Hot_Star/Hot_Star.png
+    - assets/icons/ESPN/ESPN.png
+    - assets/icons/SonyLiv/SonyLiv.png
+    - assets/icons/Udmey/Udmey.png
+    - assets/icons/BBC_IPlayer/BBC_IPlayer.png
+    - assets/icons/CNN/CNN.png
+    - assets/icons/Tiktok/Tiktok.png
+    - assets/icons/Coursera/Coursera.png
+    - assets/icons/Periscope/Periscope.png
+    - assets/icons/Twitch/Twitch.png
+    - assets/icons/Vimeo/Vimeo.png
+    - assets/icons/Redit/Redit.png
+    - assets/icons/Dailymotion/Dailymotion.png
+    - assets/icons/linkedin/linkedin.png
+    - assets/icons/twitter/twitter.png
+    - assets/icons/facebook1/facebook1.png
+    - assets/icons/insta1/insta1.png
+    - assets/icons/yt1/yt1.png
+    - assets/icons/download_icon/download_icon.png
+    - assets/icons/screenshot/screenshot.png
+    - assets/icons/home/home.png
+    - assets/icons/imageConverter/imageConverter.png
+    - assets/icons/dummyTextGenerator/dummyTextGenerator.png
+    - assets/icons/avatarGenerator/avatarGenerator.png
+    - assets/icons/iconGenerator/iconGenerator.png
+    - assets/icons/urlEnhancer/urlEnhancer.png
+    - assets/icons/imageSizeEnhancer/imageSizeEnhancer.png
+    - assets/icons/imageConverter/imageConverter.png
+    - assets/icons/backgroundRemover/backgroundRemover.png
+    - assets/icons/logo/logo.png
+    - assets/icons/plateForm/plateForm.png
+    - assets/icons/tools/tools.png
+    - assets/icons/arrowIcon/arrowIcon.png
+    - assets/icons/LogoutIcon/LogoutIcon.png
+    - assets/icons/Premium/Premium.png
+    - assets/icons/Pro_Icon/Pro_Icon.png
+    - assets/icons/account_settings/account_settings.png
+    - assets/icons/ButtonPro/ButtonPro.png
+    - assets/icons/arrowIcon/arrowIcon.png
+    - assets/icons/History/History.png
+    - assets/icons/NoHistoryImage/NoHistoryImage.png
+    - assets/icons/platformSelected/platformSelected.png
+    - assets/icons/homeSelected/homeSelected.png
+    - assets/icons/otherToolsSelected/otherToolsSelected.png
     - .env
   #   - images/a_dot_ham.jpeg
 

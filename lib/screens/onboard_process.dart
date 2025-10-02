@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:qaisar/screens/bottom_navigation_bar/my_bottom_navigation_bar.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:qaisar/screens/profile_section/onboarding_Controlle.dart';
-import 'package:qaisar/screens/splash_screen.dart';
-
 import 'home_screen.dart';
 
 class OnboardingScreen extends StatefulWidget {
@@ -13,12 +13,18 @@ class OnboardingScreen extends StatefulWidget {
 }
 
 class _OnboardingScreenState extends State<OnboardingScreen> {
-
   final controller = Get.put(OnBoardingController());
+
+  Future<void> _completeOnboarding() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool("seenOnboarding", true);
+
+    // Navigate to Home (or BottomNavigation)
+    Get.offAll(() => const MyBottomNavigationBar());
+  }
 
   @override
   Widget build(BuildContext context) {
-
     double h = MediaQuery.of(context).size.height;
     double w = MediaQuery.of(context).size.width;
 
@@ -27,15 +33,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            SizedBox(height: h * .1,),
+            SizedBox(height: h * .1),
             Align(
               alignment: Alignment.topRight,
               child: Padding(
                 padding: const EdgeInsets.only(right: 20),
                 child: GestureDetector(
-                  onTap: (){
-                    Get.offAll(() => HomeScreen());
-                  },
+                  onTap: _completeOnboarding,
                   child: Container(
                     height: h * .04,
                     width: w * .18,
@@ -43,82 +47,87 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       color: Colors.grey.shade100,
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: Center(child: Text('Skip',style: TextStyle(color: Color(0xff726DDE),
-                        fontWeight: FontWeight.w700),),),
+                    child: const Center(
+                      child: Text(
+                        'Skip',
+                        style: TextStyle(
+                          color: Color(0xff726DDE),
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
                   ),
                 ),
               ),
             ),
-            SizedBox(
-              height: h * .06,
-            ),
-            Obx((){
+            SizedBox(height: h * .06),
+            Obx(() {
               return Container(
                 height: h * .35,
                 width: w * .9,
                 decoration: BoxDecoration(
-                    image: DecorationImage(
-                        fit: BoxFit.cover,
-                        image: AssetImage(
-                          controller.images[controller.currentIndex.value],
-                        ))
+                  image: DecorationImage(
+                    fit: BoxFit.cover,
+                    image: AssetImage(
+                      controller.images[controller.currentIndex.value],
+                    ),
+                  ),
                 ),
               );
             }),
-            SizedBox(height: h * .06,),
-            Obx((){
+            SizedBox(height: h * .06),
+            Obx(() {
               return Column(
                 children: [
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: Row(
                       children: [
-                        AnimatedContainer(
-                          height: h * .02,
-                          width: controller.currentIndex.value == 0 ? w * .08 : w * .03,
-                          decoration: BoxDecoration(
-                            color: controller.currentIndex.value == 0 ? Color(0xff726DDE)
-                                : Colors.grey.shade300,
-                            shape: BoxShape.circle,
+                        ...List.generate(
+                          3,
+                          (index) => Padding(
+                            padding: const EdgeInsets.only(right: 5),
+                            child: AnimatedContainer(
+                              height: h * .02,
+                              width: controller.currentIndex.value == index
+                                  ? w * .08
+                                  : w * .03,
+                              decoration: BoxDecoration(
+                                color: controller.currentIndex.value == index
+                                    ? const Color(0xff726DDE)
+                                    : Colors.grey.shade300,
+                                shape: BoxShape.circle,
+                              ),
+                              duration: const Duration(milliseconds: 300),
+                            ),
                           ),
-                          duration: Duration(milliseconds: 300),
                         ),
-                        SizedBox(width: 5,),
-                        AnimatedContainer(
-                            height: h * .02,
-                            width: controller.currentIndex.value == 1 ? w * .08 : w * .03,
-                            decoration: BoxDecoration(
-                              color: controller.currentIndex.value == 1 ? Color(0xff726DDE)
-                                  : Colors.grey.shade300,
-                              shape: BoxShape.circle,
-                            ),
-                            duration: Duration(milliseconds: 300)),
-                        SizedBox(width: 5,),
-                        AnimatedContainer(
-                            height: h * .02,
-                            width: controller.currentIndex.value == 2 ? w * .08 : w * .03,
-                            decoration: BoxDecoration(
-                              color: controller.currentIndex.value == 2 ? Color(0xff726DDE)
-                                  : Colors.grey.shade300,
-                              shape: BoxShape.circle,
-                            ),
-                            duration: Duration(milliseconds: 300)),
-                        SizedBox(width: 5,),
-                        Spacer(),
+                        const Spacer(),
                         GestureDetector(
-                          onTap: (){
-                            controller.nextStep();
+                          onTap: () {
+                            if (controller.currentIndex.value == 2) {
+                              // last slide → complete onboarding
+                              _completeOnboarding();
+                            } else {
+                              controller.nextStep();
+                            }
                           },
                           child: Container(
-                            
                             height: h * .04,
                             width: w * .18,
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(8),
-                              color: Color(0xff726DDE)
+                              color: const Color(0xff726DDE),
                             ),
-                            child: Center(child: Text('Next',style: TextStyle(color: Colors.white,
-                                fontWeight: FontWeight.w600),),),
+                            child: const Center(
+                              child: Text(
+                                'Next',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
                           ),
                         ),
                       ],
@@ -127,19 +136,18 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 ],
               );
             }),
-            SizedBox(height: 20,),
+            SizedBox(height: 20),
             Container(
               height: h * .3,
               width: w,
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.only(
+                borderRadius: const BorderRadius.only(
                   topRight: Radius.circular(10),
                   topLeft: Radius.circular(10),
                 ),
                 color: Colors.grey.shade100,
               ),
             ),
-
           ],
         ),
       ),
