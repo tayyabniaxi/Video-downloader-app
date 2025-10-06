@@ -51,7 +51,7 @@ class AppIcons {
   static const tick = '${baseIconPath}Tick.png';
   static const star = '${baseIconPath}star.png';
   static const historyPicture = '${baseIconPath}History/History.png';
-  static const uploadIcon = '${baseIconPath}uploadIcon.png';
+  static const uploadIcon = '${baseIconPath}uploadIcon/uploadIcon.png';
   static const iconLink = '${baseIconPath}IconLink.png';
   static const platformSelected = '${baseIconPath}platformSelected/platformSelected.png';
   static const otherToolsSelected = '${baseIconPath}otherToolsSelected/otherToolsSelected.png';

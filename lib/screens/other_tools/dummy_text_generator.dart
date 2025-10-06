@@ -19,7 +19,7 @@ class _DummyTextGeneratorState extends State<DummyTextGenerator> {
           title: ToolAppbarText(text: 'Dummy Text',),
           backgroundColor: Colors.white,
         ),
-        body: ToolsGeneratorField(height: height, text: 'Dummy Text Generator', subtitle: 'Generate Dummy Text', buttonText: 'GENERATE TEXT')
+        body: Center(child: ToolsGeneratorField(height: height, text: 'Dummy Text Generator', subtitle: 'Generate Dummy Text', buttonText: 'GENERATE TEXT'))
     );
   }
 }

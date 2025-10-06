@@ -19,7 +19,7 @@ class _AvatarGeneratorState extends State<AvatarGenerator> {
         title: ToolAppbarText(text: 'Avatar Generator',),
         backgroundColor: Colors.white,
       ),
-      body: ToolsGeneratorField(height: height, text: 'Avatar Generator', subtitle: 'Generate Your Perfect Avatar', buttonText: 'GENERATE AVATAR'),
+      body: Center(child: ToolsGeneratorField(height: height, text: 'Avatar Generator', subtitle: 'Generate Your Perfect Avatar', buttonText: 'GENERATE AVATAR')),
     );
   }
 }

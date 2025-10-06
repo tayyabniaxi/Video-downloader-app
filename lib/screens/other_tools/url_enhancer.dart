@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
@@ -46,124 +47,157 @@ class _UrlEnhancerState extends State<UrlEnhancer> {
                 ),
               ),
               SizedBox(height: height * 0.01),
-              Text('Customize your url size...', style: TextStyle(fontSize: 14)),
+              Text(
+                'Customize your url size...',
+                style: TextStyle(fontSize: 14),
+              ),
               SizedBox(height: height * 0.02),
-              Container(
-                width: width * 1,
-                height: height * 0.49,
-                decoration: BoxDecoration(
-                  color: Color(0xFFF5F2FF),
-                  borderRadius: BorderRadius.circular(8),
+              DottedBorder(
+                options: RoundedRectDottedBorderOptions(
+                  dashPattern: [10, 5],
+                  strokeWidth: 2,
+                  radius: Radius.circular(8),
+                  color: Colors.indigo.shade300,
+                  //   padding: EdgeInsets.all(16),
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    SizedBox(height: height * 0.02),
-                    Text(
-                      'Shorten a long url',
-                      style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(height: height * 0.02),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 15, right: 15),
-                      child: CustomTextField(
-                        url: urlInputController,
-                        hintText: 'Enter url here',
-                      ),
-                    ),
-
-                Obx(
-                        () => controller.shortUrl.value.isNotEmpty?
-                  Column(
+                child: Container(
+                  width: width * 1,
+                  // height: height * 0.49,
+                  decoration: BoxDecoration(
+                    color: Color(0xFFF5F2FF),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       SizedBox(height: height * 0.02),
                       Text(
-                        'Tiny url',
-                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                        'Shorten a long url',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                       SizedBox(height: height * 0.02),
                       Padding(
                         padding: const EdgeInsets.only(left: 15, right: 15),
-                        child: Obx( ()=>controller.shortUrl.value.isNotEmpty?
-                        TextField(
-                          controller:  controller.shortUrlController, //,
-                          decoration: InputDecoration(
-                            fillColor: Colors.white,
-                            filled: true,
-                            hintText: "",
-                            hintStyle: TextStyle(
-                              fontFamily: 'Montserrat',
-                              fontWeight: FontWeight.w400,
-                              fontSize: 14,
-                              color: Color(0xff9999A2),
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
-                                borderSide: BorderSide(
-                                  color: Colors.white,
-                                )
-                            ),
-                          ),
-                        ): const SizedBox.shrink(),
+                        child: CustomTextField(
+                          url: urlInputController,
+                          hintText: 'Enter url here',
                         ),
                       ),
 
+                      Obx(
+                        () => controller.shortUrl.value.isNotEmpty
+                            ? Column(
+                                children: [
+                                  SizedBox(height: height * 0.02),
+                                  Text(
+                                    'Tiny url',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  SizedBox(height: height * 0.02),
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                      left: 15,
+                                      right: 15,
+                                    ),
+                                    child: Obx(
+                                      () => controller.shortUrl.value.isNotEmpty
+                                          ? TextField(
+                                              controller: controller
+                                                  .shortUrlController, //,
+                                              decoration: InputDecoration(
+                                                fillColor: Colors.white,
+                                                filled: true,
+                                                hintText: "",
+                                                hintStyle: TextStyle(
+                                                  fontFamily: 'Montserrat',
+                                                  fontWeight: FontWeight.w400,
+                                                  fontSize: 14,
+                                                  color: Color(0xff9999A2),
+                                                ),
+                                                enabledBorder:
+                                                    OutlineInputBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                            8,
+                                                          ),
+                                                      borderSide: BorderSide(
+                                                        color: Colors.white,
+                                                      ),
+                                                    ),
+                                              ),
+                                            )
+                                          : const SizedBox.shrink(),
+                                    ),
+                                  ),
+
+                                  SizedBox(height: height * 0.02),
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                      left: 15,
+                                      right: 15,
+                                    ),
+                                    child: Obx(
+                                      () => controller.isLoading.value
+                                          ? const CircularProgressIndicator()
+                                          : GestureDetector(
+                                              onTap: () {
+                                                controller.copyUrl();
+                                              },
+                                              child: Button(
+                                                color: Color(0xff726DDE),
+                                                text: Text(
+                                                  'Copy Url',
+                                                  style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontWeight: FontWeight.w500,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                    ),
+                                  ),
+                                ],
+                              )
+                            : SizedBox(),
+                      ),
                       SizedBox(height: height * 0.02),
+
                       Padding(
                         padding: const EdgeInsets.only(left: 15, right: 15),
                         child: Obx(
-                              () => controller.isLoading.value
+                          () => controller.isLoading.value
                               ? const CircularProgressIndicator()
                               : GestureDetector(
-                            onTap: () {
-                              controller.copyUrl();
-                            },
-                            child: Button(
-                              color: Color(0xff726DDE),
-                              text: Text(
-                                'Copy Url',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ):SizedBox(),
-                ),
-                    SizedBox(height: height * 0.02),
-
-                    Padding(
-                      padding: const EdgeInsets.only(left: 15, right: 15),
-                      child: Obx(
-                        () => controller.isLoading.value
-                            ? const CircularProgressIndicator()
-                            : GestureDetector(
-                                onTap: () {
-                                  controller.shortenUrl(
-                                    urlInputController.text.trim(),
-                                  );
-                                },
-                                child: Button(
-                                  color: Color(0xff726DDE),
-                                  text: Text(
-                                    'Shorten URL',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w500,
+                                  onTap: () {
+                                    controller.shortenUrl(
+                                      urlInputController.text.trim(),
+                                    );
+                                  },
+                                  child: Button(
+                                    color: Color(0xff726DDE),
+                                    text: Text(
+                                      'Shorten URL',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w500,
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ),
+                        ),
                       ),
-                    ),
-                    SizedBox(height: height * 0.02),
-                  ],
+                      SizedBox(height: height * 0.02),
+                    ],
+                  ),
                 ),
               ),
+              SizedBox(),
               // const SizedBox(height: 20),
               // Obx(
               //   () => controller.shortUrl.value.isNotEmpty

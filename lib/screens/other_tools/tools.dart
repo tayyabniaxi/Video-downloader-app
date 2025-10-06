@@ -37,6 +37,7 @@ class _ToolsState extends State<Tools> {
     final height = MediaQuery.of(context).size.height;
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         backgroundColor: Colors.white,
         title: CustomRow(width: width * 0.4, text: 'Other Tools',logo: AppIcons.logo,)
       ),
@@ -104,14 +105,17 @@ class _ToolsState extends State<Tools> {
               child: Card(
                 color: Colors.white,
                 elevation: 0,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Image.asset(tools[index]['icon']!),
-                    SizedBox(height: height * 0.02),
-                    Text(tools[index]['name']!,textAlign: TextAlign.center,maxLines: 2,overflow: TextOverflow.ellipsis),
-                  ],
+                child: Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Image.asset(tools[index]['icon']!),
+                      SizedBox(height: height * 0.02),
+                      Text(tools[index]['name']!,textAlign: TextAlign.center,maxLines: 2,overflow: TextOverflow.ellipsis,style: TextStyle(fontSize: 12),),
+                    ],
+                  ),
                 ),
               ),
             )

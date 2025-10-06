@@ -17,6 +17,8 @@ class ToolsGeneratorField extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.all(15.0),
       child: Column(
+       // mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Text(text,style: TextStyle(fontSize: 18,fontFamily: 'Montserrat',fontWeight: FontWeight.bold)),
           SizedBox(height: height * 0.01),

@@ -83,6 +83,7 @@ class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> {
             splashColor: Colors.transparent,
           ),
           child: BottomNavigationBar(
+            backgroundColor: Colors.white,
             currentIndex: _selectedIndex,
             onTap: _onItemTapped,
             selectedItemColor: const Color(0xff726DDE),
@@ -151,7 +152,7 @@ class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> {
                         color: Colors.grey,
                         height: 24,
                       ),
-                label: 'Platform',
+                label: 'Other Tools',
               ),
 
             ],

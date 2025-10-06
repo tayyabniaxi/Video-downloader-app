@@ -64,10 +64,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             Obx(() {
               return Container(
                 height: h * .35,
-                width: w * .9,
+                width: w * .8,
                 decoration: BoxDecoration(
                   image: DecorationImage(
-                    fit: BoxFit.cover,
+                    fit: BoxFit.fill,
                     image: AssetImage(
                       controller.images[controller.currentIndex.value],
                     ),
@@ -86,12 +86,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         ...List.generate(
                           3,
                           (index) => Padding(
-                            padding: const EdgeInsets.only(right: 5),
+                            padding: const EdgeInsets.only(right: 3),
                             child: AnimatedContainer(
                               height: h * .02,
                               width: controller.currentIndex.value == index
-                                  ? w * .08
-                                  : w * .03,
+                                  ? w * .05
+                                  : w * .02,
                               decoration: BoxDecoration(
                                 color: controller.currentIndex.value == index
                                     ? const Color(0xff726DDE)

@@ -59,7 +59,7 @@ class _ProfileSectionState extends State<ProfileSection> {
               ),
             ),
             GestureDetector(
-              onTap: () => Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => Premium())),
+              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => Premium())),
               child: CustomListTile(
                 icon: AppIcons.proIcon,
                 title: 'Premium',

@@ -56,7 +56,7 @@ class _HistoryState extends State<History> {
             Stack(
               alignment: Alignment.center,
               children: [
-                Image.asset(AppImages.proImage)
+                Image.asset(AppImages.noHistoryImage)
               ],
             ),
             const SizedBox(height: 20),
@@ -96,8 +96,8 @@ class _HistoryState extends State<History> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Image.asset(
-              AppImages.noHistoryImage, // faded history icon
+            Image.asset(""
+             // AppImages.noHistoryImage, // faded history icon
             ),
             const SizedBox(height: 15),
             const Text(

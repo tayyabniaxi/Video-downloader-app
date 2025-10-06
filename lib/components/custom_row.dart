@@ -19,19 +19,17 @@ class CustomRow extends StatelessWidget {
     return Row(
       children: [
         // Show logo only if provided
-        if (logo != null)
-          Image.asset(logo!, height: 24, width: 24),
+        if (logo != null) Image.asset(logo!, height: 24, width: 24),
 
-        if (logo != null)
-          SizedBox(width: width * 0.05),
-
+        if (logo != null) SizedBox(width: width * 0.05),
+SizedBox(width: 5,),
         Expanded(
           child: Text(
             text,
             style: const TextStyle(
-              fontSize: 20,
+              fontSize: 15,
               fontFamily: 'Montserrat',
-              fontWeight: FontWeight.w600,
+              fontWeight: FontWeight.bold,
             ),
             overflow: TextOverflow.ellipsis,
           ),

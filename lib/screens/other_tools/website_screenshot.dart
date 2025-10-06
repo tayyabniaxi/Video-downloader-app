@@ -22,15 +22,22 @@ class _WebsiteScreenshotState extends State<WebsiteScreenshot> {
         backgroundColor: Colors.white,
       ),
       body: Padding(
-        padding: const EdgeInsets.all(15.0),
+        padding: const EdgeInsets.all(8.0),
         child: Column(
           children: [
-            Text('Website Screenshot',style: TextStyle(fontSize: 18,fontFamily: 'Montserrat',fontWeight: FontWeight.bold)),
+            Text(
+              'Website Screenshot',
+              style: TextStyle(
+                fontSize: 18,
+                fontFamily: 'Montserrat',
+                fontWeight: FontWeight.bold,
+              ),
+            ),
             SizedBox(height: height * 0.01),
-            Text('Create Website Screenshots',style: TextStyle(fontSize: 14)),
+            Text('Create Website Screenshots', style: TextStyle(fontSize: 14)),
             SizedBox(height: height * 0.02),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12.0),
+              padding: const EdgeInsets.symmetric(horizontal: 7.0),
               child: TextField(
                 decoration: InputDecoration(
                   prefixIcon: Padding(
@@ -47,9 +54,7 @@ class _WebsiteScreenshotState extends State<WebsiteScreenshot> {
                         borderRadius: BorderRadius.circular(8),
                       ),
                       padding: const EdgeInsets.all(6),
-                      child: Image.asset(
-                        AppIcons.arrow,
-                      ),
+                      child: Image.asset(AppIcons.arrow),
                     ),
                   ),
                   hintText: 'Enter website url...',
@@ -63,7 +68,10 @@ class _WebsiteScreenshotState extends State<WebsiteScreenshot> {
                   fillColor: Colors.white,
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(color: Color(0xff9591E6),width: width * 0.004),
+                    borderSide: BorderSide(
+                      color: Color(0xff9591E6),
+                      width: width * 0.004,
+                    ),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),

@@ -21,7 +21,7 @@ class _IconGeneratorState extends State<IconGenerator> {
         title: ToolAppbarText(text: 'Icon Generator',),
         backgroundColor: Colors.white,
       ),
-      body: ToolsGeneratorField(height: height, text: 'Icon Generator', subtitle: 'Generate stunning Icons in seconds...', buttonText: 'GENERATE ICON')
+      body: Center(child: ToolsGeneratorField(height: height, text: 'Icon Generator', subtitle: 'Generate stunning Icons in seconds...', buttonText: 'GENERATE ICON'))
     );
   }
 }

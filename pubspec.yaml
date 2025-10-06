@@ -50,9 +50,9 @@ dependencies:
   permission_handler: ^12.0.1
   media_store_plus: ^0.1.3
   image_picker: ^1.2.0
-  video_player: ^2.10.0
-  chewie: ^1.13.0
-  better_player_plus: ^1.1.0
+  #video_player: ^2.10.0
+  #chewie: ^1.13.0
+  #better_player_plus: ^1.1.0
   shared_preferences: ^2.3.2
 
   # Auto-play/pause in feed
@@ -62,11 +62,11 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  youtube_player_flutter: ^9.1.2  # For YouTube videos/Shorts
+ # youtube_player_flutter: ^9.1.2  # For YouTube videos/Shorts
   url_launcher: ^6.3.0          # Fallback to open Instagram/Facebook apps
-  visibility_detector: ^0.4.0+2
-  webview_flutter: ^4.7.0
-  flutter_inappwebview: ^6.1.5
+  #visibility_detector: ^0.4.0+2
+  #webview_flutter: ^4.7.0
+ # flutter_inappwebview: ^6.1.5
 #  build_runner: ^2.4.8
 #  json_serializable: ^6.7.1   # only if you're generating JSON code
 #  freezed: ^2.5.2
@@ -135,10 +135,11 @@ flutter:
     - assets/icons/ButtonPro/ButtonPro.png
     - assets/icons/arrowIcon/arrowIcon.png
     - assets/icons/History/History.png
-    - assets/icons/NoHistoryImage/NoHistoryImage.png
+    - assets/images/NoHistoryImage/NoHistoryImage.png
     - assets/icons/platformSelected/platformSelected.png
     - assets/icons/homeSelected/homeSelected.png
     - assets/icons/otherToolsSelected/otherToolsSelected.png
+    - assets/icons/uploadIcon/uploadIcon.png
     - .env
   #   - images/a_dot_ham.jpeg
 

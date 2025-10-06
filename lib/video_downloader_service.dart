@@ -8,7 +8,7 @@ import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import 'package:image_gallery_saver_plus/image_gallery_saver_plus.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:video_player/video_player.dart';
+//import 'package:video_player/video_player.dart';
 
 class VideoDownloaderService extends GetxController {
   var thumbnail = "".obs;
@@ -91,10 +91,8 @@ class VideoDownloaderService extends GetxController {
             videoData['medias'] ?? [],
           );
 
-
-
           /// Show popup after success
-         // showQualityDialog();
+          // showQualityDialog();
         } else {
           // Get.snackbar(
           //   "Error",
@@ -103,25 +101,24 @@ class VideoDownloaderService extends GetxController {
         }
       } else {
         final errorData = jsonDecode(response.body);
-       // Get.snackbar("Error", errorData['message'] ?? "Service unavailable");
+        // Get.snackbar("Error", errorData['message'] ?? "Service unavailable");
       }
     } catch (e) {
-    //  Get.snackbar("Error", "Network error occurred");
+      //  Get.snackbar("Error", "Network error occurred");
     }
   }
+
   final selectedMedia = Rxn<Map<String, dynamic>>();
   void showQualityDialog() {
     final selectedMedia = Rxn<Map<String, dynamic>>();
 
     Get.dialog(
       Dialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         insetPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 24),
         backgroundColor: Colors.white,
         child: Obx(
-              () => Padding(
+          () => Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -147,31 +144,33 @@ class VideoDownloaderService extends GetxController {
 
                 // List of qualities
                 ...medias.map(
-                      (m) => Container(
-                    margin: const EdgeInsets.symmetric(vertical: 6),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                      color: Colors.grey.shade100,
-                    ),
-                    child: ListTile(
-                      onTap: () => selectedMedia.value = m,
-                      shape: RoundedRectangleBorder(
+                  (m) => SingleChildScrollView(
+                    child: Container(
+                      margin: const EdgeInsets.symmetric(vertical: 6),
+                      decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(12),
+                        color: Colors.grey.shade100,
                       ),
-                      leading: Text(
-                        "MP4",
-                        style: TextStyle(
-                          color: Colors.purple,
-                          fontWeight: FontWeight.bold,
+                      child: ListTile(
+                        onTap: () => selectedMedia.value = m,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
                         ),
-                      ),
-                      trailing: Text(
-                        m['label'] ?? "Unknown",
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          color: selectedMedia.value == m
-                              ? Colors.purple
-                              : Colors.black,
+                        leading: Text(
+                          "MP4",
+                          style: TextStyle(
+                            color: Colors.purple,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        trailing: Text(
+                          m['label'] ?? "Unknown",
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            color: selectedMedia.value == m
+                                ? Colors.purple
+                                : Colors.black,
+                          ),
                         ),
                       ),
                     ),
@@ -190,9 +189,9 @@ class VideoDownloaderService extends GetxController {
                       );
                       Get.back();
                     } else {
-                    //   Get.snackbar(
-                    //       "Error", "Please select a video quality first");
-                     }
+                      //   Get.snackbar(
+                      //       "Error", "Please select a video quality first");
+                    }
                   },
                   child: Container(
                     width: double.infinity,
@@ -222,114 +221,114 @@ class VideoDownloaderService extends GetxController {
     );
   }
 
-//   void showQualityDialog() {
-//
-//     Get.dialog(
-//       // Define a reactive variable to hold selected media
-//
-// // Dialog
-//     AlertDialog(
-//       backgroundColor: Colors.white,
-//       shape: RoundedRectangleBorder(
-//         borderRadius: BorderRadius.circular(16),
-//       ),
-//       title: Row(
-//         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//         children: [
-//           Text(
-//             "Select Video Quality",
-//             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-//           ),
-//           IconButton(
-//             icon: Icon(Icons.close, color: Colors.grey[700]),
-//             onPressed: () => Get.back(),
-//           ),
-//         ],
-//       ),
-//       content: Obx(
-//             () => Column(
-//           mainAxisSize: MainAxisSize.min,
-//           children: [
-//             SizedBox(height: 5),
-//             ...medias.map(
-//                   (m) => Padding(
-//                 padding: const EdgeInsets.all(5.0),
-//                 child: GestureDetector(
-//                   onTap: () {
-//                     // set selected media
-//                     selectedMedia.value = m;
-//                   },
-//                   child: Container(
-//                     height: 50,
-//                     decoration: BoxDecoration(
-//                       borderRadius: BorderRadius.circular(12),
-//                       color: selectedMedia.value == m
-//                           ? Color(0xff726DDE).withOpacity(0.2) // highlight selected
-//                           : Colors.grey.shade100,
-//                     ),
-//                     child: ListTile(
-//                       title: Text(
-//                         m['label'] ?? "Unknown",
-//                         style: TextStyle(fontSize: 12),
-//                       ),
-//                       trailing: Icon(
-//                         selectedMedia.value == m
-//                             ? Icons.check_circle
-//                             : Icons.download,
-//                         color: selectedMedia.value == m
-//                             ? Color(0xff726DDE)
-//                             : Colors.grey,
-//                       ),
-//                     ),
-//                   ),
-//                 ),
-//               ),
-//             ),
-//             SizedBox(height: 15),
-//             Padding(
-//               padding: const EdgeInsets.all(5.0),
-//               child: GestureDetector(
-//                 onTap: () {
-//                   if (selectedMedia.value != null) {
-//                     // download only selected media
-//                     downloadDirectUrl(
-//                       selectedMedia.value!['url'],
-//                       selectedMedia.value!['label'],
-//                     );
-//                     Get.back();
-//                   } else {
-//                     Get.snackbar("Error", "Please select a quality first");
-//                   }
-//                 },
-//                 child: Container(
-//                   width: double.infinity,
-//                   height: 45,
-//                   decoration: BoxDecoration(
-//                     color: Color(0xff726DDE),
-//                     borderRadius: BorderRadius.circular(10),
-//                   ),
-//                   child: Center(
-//                     child: Text(
-//                       "Continue To Download",
-//                       style: TextStyle(
-//                         color: Colors.white,
-//                         fontWeight: FontWeight.bold,
-//                       ),
-//                     ),
-//                   ),
-//                 ),
-//               ),
-//             ),
-//           ],
-//         ),
-//       ),
-//     ),
-//
-//     // barrierDismissible: true,
-//       barrierColor: Colors.black.withOpacity(0.4),
-//       barrierDismissible: true,
-//     );
-//   }
+  //   void showQualityDialog() {
+  //
+  //     Get.dialog(
+  //       // Define a reactive variable to hold selected media
+  //
+  // // Dialog
+  //     AlertDialog(
+  //       backgroundColor: Colors.white,
+  //       shape: RoundedRectangleBorder(
+  //         borderRadius: BorderRadius.circular(16),
+  //       ),
+  //       title: Row(
+  //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //         children: [
+  //           Text(
+  //             "Select Video Quality",
+  //             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+  //           ),
+  //           IconButton(
+  //             icon: Icon(Icons.close, color: Colors.grey[700]),
+  //             onPressed: () => Get.back(),
+  //           ),
+  //         ],
+  //       ),
+  //       content: Obx(
+  //             () => Column(
+  //           mainAxisSize: MainAxisSize.min,
+  //           children: [
+  //             SizedBox(height: 5),
+  //             ...medias.map(
+  //                   (m) => Padding(
+  //                 padding: const EdgeInsets.all(5.0),
+  //                 child: GestureDetector(
+  //                   onTap: () {
+  //                     // set selected media
+  //                     selectedMedia.value = m;
+  //                   },
+  //                   child: Container(
+  //                     height: 50,
+  //                     decoration: BoxDecoration(
+  //                       borderRadius: BorderRadius.circular(12),
+  //                       color: selectedMedia.value == m
+  //                           ? Color(0xff726DDE).withOpacity(0.2) // highlight selected
+  //                           : Colors.grey.shade100,
+  //                     ),
+  //                     child: ListTile(
+  //                       title: Text(
+  //                         m['label'] ?? "Unknown",
+  //                         style: TextStyle(fontSize: 12),
+  //                       ),
+  //                       trailing: Icon(
+  //                         selectedMedia.value == m
+  //                             ? Icons.check_circle
+  //                             : Icons.download,
+  //                         color: selectedMedia.value == m
+  //                             ? Color(0xff726DDE)
+  //                             : Colors.grey,
+  //                       ),
+  //                     ),
+  //                   ),
+  //                 ),
+  //               ),
+  //             ),
+  //             SizedBox(height: 15),
+  //             Padding(
+  //               padding: const EdgeInsets.all(5.0),
+  //               child: GestureDetector(
+  //                 onTap: () {
+  //                   if (selectedMedia.value != null) {
+  //                     // download only selected media
+  //                     downloadDirectUrl(
+  //                       selectedMedia.value!['url'],
+  //                       selectedMedia.value!['label'],
+  //                     );
+  //                     Get.back();
+  //                   } else {
+  //                     Get.snackbar("Error", "Please select a quality first");
+  //                   }
+  //                 },
+  //                 child: Container(
+  //                   width: double.infinity,
+  //                   height: 45,
+  //                   decoration: BoxDecoration(
+  //                     color: Color(0xff726DDE),
+  //                     borderRadius: BorderRadius.circular(10),
+  //                   ),
+  //                   child: Center(
+  //                     child: Text(
+  //                       "Continue To Download",
+  //                       style: TextStyle(
+  //                         color: Colors.white,
+  //                         fontWeight: FontWeight.bold,
+  //                       ),
+  //                     ),
+  //                   ),
+  //                 ),
+  //               ),
+  //             ),
+  //           ],
+  //         ),
+  //       ),
+  //     ),
+  //
+  //     // barrierDismissible: true,
+  //       barrierColor: Colors.black.withOpacity(0.4),
+  //       barrierDismissible: true,
+  //     );
+  //   }
 
   // void downloadDirectUrl(String url, String quality) {
   //   // your download implementation here
@@ -415,26 +414,26 @@ class VideoDownloaderService extends GetxController {
       Get.snackbar("Success", "Video downloaded successfully");
     } catch (e) {
       print("Direct download error: $e");
-   //   Get.snackbar("Error", "Direct download failed: $e");
+      //   Get.snackbar("Error", "Direct download failed: $e");
     } finally {
       isDownloading.value = false;
     }
   }
 
-  late VideoPlayerController videoController;
-  RxBool isVideoInitialized = false.obs;
+  // late VideoPlayerController videoController;
+  // RxBool isVideoInitialized = false.obs;
 
-  void initVideo(String url) {
-    videoController = VideoPlayerController.networkUrl(Uri.parse(url))
-      ..initialize().then((_) {
-        isVideoInitialized.value = true;
-        update();
-      });
-  }
+  // void initVideo(String url) {
+  //   videoController = VideoPlayerController.networkUrl(Uri.parse(url))
+  //     ..initialize().then((_) {
+  //       isVideoInitialized.value = true;
+  //       update();
+  //     });
+  // }
 
   @override
   void onClose() {
-    videoController.dispose();
+    // videoController.dispose();
     super.onClose();
   }
 }

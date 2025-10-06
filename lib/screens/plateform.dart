@@ -13,6 +13,7 @@ class PlateForm extends StatelessWidget {
     final width = MediaQuery.of(context).size.width;
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         backgroundColor: Colors.white,
         title: CustomRow(width: width * 0.4, text: 'Select Platform'),
       ),
@@ -57,7 +58,7 @@ class PlateForm extends StatelessWidget {
                   children: [
                     Image.asset(platform['icon']),
                     SizedBox(height: height * 0.01),
-                    Text(platform['name']),
+                    Text(platform['name'],style: TextStyle(fontSize: 12)),
                   ],
                 ),
               ),

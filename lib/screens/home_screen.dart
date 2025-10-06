@@ -8,8 +8,9 @@ import 'package:qaisar/screens/bottom_navigation_bar/my_bottom_navigation_bar.da
 import 'package:qaisar/screens/profile_section/profile_section.dart';
 import 'package:qaisar/screens/video_player_screen.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:video_player/video_player.dart'; // Add video_player import
+//import 'package:video_player/video_player.dart'; // Add video_player import
 import '../components/custom_row.dart';
+//import '../components/textformfield.dart';
 import '../video_downloader_service.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -27,7 +28,7 @@ class HomeScreenState extends State<HomeScreen> {
   int selectedIndex = 0;
   TextEditingController _link = TextEditingController();
   late Map<String, dynamic> currentPlateForm;
-  VideoPlayerController? _videoPlayerController; // Video player controller
+  //VideoPlayerController? _videoPlayerController; // Video player controller
   bool _isVideoInitialized = false;
 
   void updatePlatform(Map<String, dynamic> platform) {
@@ -60,7 +61,7 @@ class HomeScreenState extends State<HomeScreen> {
 
   @override
   void dispose() {
-    _videoPlayerController?.dispose(); // Dispose of video controller
+    //_videoPlayerController?.dispose(); // Dispose of video controller
     super.dispose();
   }
 
@@ -73,6 +74,7 @@ class HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         backgroundColor: Colors.white,
         title: GestureDetector(
           onTap: () => Navigator.push(
@@ -87,97 +89,71 @@ class HomeScreenState extends State<HomeScreen> {
         ),
       ),
       body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            SizedBox(height: height * 0.03),
-            Container(
-              height: MediaQuery.of(context).size.height*0.09,
-              child: Image.asset(
-                currentPlateForm['icon'] ?? AppIcons.downloadIcon,
-                errorBuilder: (context, error, stackTrace) =>
-                    const Icon(Icons.error),
+        child: Padding(
+          padding: const EdgeInsets.all(15.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              SizedBox(height: height * 0.03),
+              Container(
+                height: MediaQuery.of(context).size.height * 0.09,
+                child: Image.asset(
+                  currentPlateForm['icon'] ?? AppIcons.downloadIcon,
+                  errorBuilder: (context, error, stackTrace) =>
+                      const Icon(Icons.error),
+                ),
               ),
-            ),
-            SizedBox(height: height * 0.01),
-            Text(
-              currentPlateForm['title'] ?? 'Download Any Video',
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-            ),
-            SizedBox(height: height * 0.01),
-            Text(
-              currentPlateForm['subtitle'] ??
-                  'Download Video From Any Platform',
-              style: const TextStyle(
-                fontSize: 14,
-                color: Color(0xff8F8F8F),
-                fontWeight: FontWeight.w500,
+              SizedBox(height: height * 0.01),
+              Text(
+                currentPlateForm['title'] ?? 'Download Any Video',
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                ),
               ),
-            ),
-            SizedBox(height: height * 0.02),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12.0),
-              child: Form(
-                key: _formkey,
-                child: TextFormField(
+              SizedBox(height: height * 0.01),
+              Text(
+                currentPlateForm['subtitle'] ??
+                    'Download Video From Any Platform',
+                style: const TextStyle(
+                  fontSize: 14,
+                  color: Color(0xff8F8F8F),
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              SizedBox(height: height * 0.02),
+
+            Form(
+              key: _formkey,
+              child: Obx(() {
+                return TextFormField(
                   controller: _link,
+                  autovalidateMode: AutovalidateMode.onUserInteraction, // 👈 Live validation
+                  onChanged: (_) {
+                    // Force rebuild when typing so ❌ icon shows/hides properly
+                    controller.isLoading.refresh();
+                  },
                   validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return "Url required";
+                    if (value == null || value.trim().isEmpty) {
+                      return "URL required";
                     }
+
+                    // 🔹 Basic URL pattern validation
+                    final urlPattern =
+                        r'^(https?:\/\/)?([\w\-]+\.)+[a-zA-Z]{2,}(:\d+)?(\/\S*)?$';
+                    final regExp = RegExp(urlPattern);
+
+                    if (!regExp.hasMatch(value.trim())) {
+                      return "Enter a valid URL";
+                    }
+
                     return null;
                   },
                   decoration: InputDecoration(
-                    suffixIcon: Padding(
-                      padding: const EdgeInsets.only(right: 4.0),
-                      child: Obx(() {
-                        return controller.isLoading.value
-                            ? SizedBox(
-                                child: SpinKitThreeBounce(
-                                  color:
-                                      currentPlateForm['buttonColor'] ??
-                                      const Color(0xff9369DF),
-                                  size: 20,
-                                ),
-                              )
-                            : GestureDetector(
-                                onTap: () async {
-                                  if (_formkey.currentState!.validate()) {
-                                    final url = _link.text.trim();
-                                    if (url.isNotEmpty) {
-                                      controller.isLoading.value = true;
-                                      await controller.videoDownloadApi(url);
-                                      controller.isLoading.value = false;
-                                      if (controller
-                                          .downloadUrl
-                                          .value
-                                          .isNotEmpty) {
-                                        // _initializeVideoPlayer(
-                                        //   controller.OriginalUrl.value,
-                                        // );
-                                      }
-                                    }
-                                  }
-                                },
-                                child: Container(
-                                  width: width * 0.15,
-                                  height: height * 0.01,
-                                  decoration: BoxDecoration(
-                                    color:
-                                        currentPlateForm['buttonColor'] ??
-                                        const Color(0xff9369DF),
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  padding: const EdgeInsets.all(6),
-                                  child: Image.asset(AppIcons.arrow),
-                                ),
-                              );
-                      }),
-                    ),
-                    hintText: 'Paste Link Here',
+                    hintText: 'Paste URL Here',
                     hintStyle: const TextStyle(
-                      color: Color(0xFF000066),
-                      fontSize: 16,
+                      color: Colors.grey,
+                      fontSize: 12,
                       fontFamily: 'Montserrat',
                       fontWeight: FontWeight.w500,
                     ),
@@ -194,254 +170,328 @@ class HomeScreenState extends State<HomeScreen> {
                         width: 2,
                       ),
                     ),
-                  ),
-                ),
-              ),
-            ),
-            SizedBox(height: height * 0.02),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                _buildPlatformIcon(width, height, 0, AppIcons.fb1),
-                SizedBox(width: width * 0.05),
-                _buildPlatformIcon(width, height, 1, AppIcons.yt1),
-                SizedBox(width: width * 0.05),
-                _buildPlatformIcon(width, height, 2, AppIcons.insta1),
-                SizedBox(width: width * 0.05),
-                GestureDetector(
-                  onTap: () async {
-                    _clearData();
-                    final selectedPlatform = await Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) =>
-                            const MyBottomNavigationBar(initialIndex: 1),
-                      ),
-                    );
-                    if (selectedPlatform != null) {
-                      updatePlatform(selectedPlatform);
-                    }
-                  },
-                  child: Container(
-                    width: width * 0.19,
-                    height: height * 0.09,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(50),
+                    errorBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: const BorderSide(color: Colors.red, width: 1.5),
                     ),
-                    child: const Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.arrow_forward_ios_sharp, size: 18),
-                        Text(
-                          'View all',
-                          style: TextStyle(
-                            fontFamily: 'Montserrat',
-                            fontWeight: FontWeight.w500,
-                            fontSize: 10,
-                          ),
-                        ),
-                      ],
+                    focusedErrorBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: const BorderSide(color: Colors.red, width: 2),
                     ),
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: height * 0.02),
-            Container(
-              width: width * 0.9,
-              height: height * 0.39,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Obx(() {
-                // Only wrap the thumbnail/video part in Obx
-                if (controller.thumbnail.value.isNotEmpty) {
-                  return Stack(
-                    children: [
-                      GestureDetector(
-                        onTap: () {
-                          print("Link ${controller.OriginalUrl.value}");
-                          // Navigator.push(
-                          //   context,
-                          //   MaterialPageRoute(
-                          //     builder: (_) => VideoPage(videoUrl:
-                          //        controller.OriginalUrl.value,
-                          //       //thumbnailUrl: "",
-                          //     ),
-                          //   ),
-                          // );
 
-                          // if (_isVideoInitialized &&
-                          //     _videoPlayerController != null) {
-                          //   setState(() {
-                          //     _videoPlayerController!.value.isPlaying
-                          //         ? _videoPlayerController!.pause()
-                          //         : _videoPlayerController!.play();
-                          //   });
-                          // }
-                        },
-                        child: GestureDetector(
+                    // ✅ Handle spinner / clear / send icons
+                    suffixIcon: Padding(
+                      padding: const EdgeInsets.only(right: 4.0),
+                      child: controller.isLoading.value
+                          ? SizedBox(
+                        width: 30,
+                        height: 30,
+                        child: SpinKitThreeBounce(
+                          color: currentPlateForm['buttonColor'] ??
+                              const Color(0xff9369DF),
+                          size: 20,
+                        ),
+                      )
+                          : Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          // ❌ Show only when text field has text
+                          if (_link.text.isNotEmpty)
+                            GestureDetector(
+                              onTap: () {
+                                _link.clear();
+                                controller.isLoading.refresh();
+                              },
+                              child: const Icon(
+                                Icons.close,
+                                color: Colors.grey,
+                                size: 22,
+                              ),
+                            ),
+                          const SizedBox(width: 6),
+                          // ➡️ Send button
+                          GestureDetector(
+                            onTap: () async {
+                              // 🔹 Validate form before proceeding
+                              if (_formkey.currentState?.validate() ?? false) {
+                                final url = _link.text.trim();
+                                controller.isLoading.value = true;
+
+                                await controller.videoDownloadApi(url);
+
+                                controller.isLoading.value = false;
+                              }
+                            },
+                            child: Container(
+                              width: 35,
+                              height: 35,
+                              decoration: BoxDecoration(
+                                color: currentPlateForm['buttonColor'] ??
+                                    const Color(0xff9369DF),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              padding: const EdgeInsets.all(6),
+                              child: Image.asset(AppIcons.arrow),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              }),
+            ),
+
+            SizedBox(height: height * 0.02),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  _buildPlatformIcon(width, height, 0, AppIcons.fb1),
+                  SizedBox(width: width * 0.05),
+                  _buildPlatformIcon(width, height, 1, AppIcons.yt1),
+                  SizedBox(width: width * 0.05),
+                  _buildPlatformIcon(width, height, 2, AppIcons.insta1),
+                  SizedBox(width: width * 0.05),
+                  GestureDetector(
+                    onTap: () async {
+                      _clearData();
+                      final selectedPlatform = await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) =>
+                              const MyBottomNavigationBar(initialIndex: 1),
+                        ),
+                      );
+                      if (selectedPlatform != null) {
+                        updatePlatform(selectedPlatform);
+                      }
+                    },
+                    child: Container(
+                      width: width * 0.19,
+                      height: height * 0.09,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(50),
+                      ),
+                      child: const Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.arrow_forward_ios_sharp, size: 18),
+                          Text(
+                            'View all',
+                            style: TextStyle(
+                              fontFamily: 'Montserrat',
+                              fontWeight: FontWeight.w500,
+                              fontSize: 10,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: height * 0.02),
+              Container(
+                width: double.infinity,
+                height: height * 0.29,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Obx(() {
+                  // Only wrap the thumbnail/video part in Obx
+                  if (controller.thumbnail.value.isNotEmpty) {
+                    return Stack(
+                      children: [
+                        GestureDetector(
                           onTap: () {
                             print("Link ${controller.OriginalUrl.value}");
-
                             // Navigator.push(
                             //   context,
                             //   MaterialPageRoute(
-                            //     builder: (_) =>
-                            //         VideoPage(videoUrl: _link.text),
+                            //     builder: (_) => VideoPage(videoUrl:
+                            //        controller.OriginalUrl.value,
+                            //       //thumbnailUrl: "",
+                            //     ),
                             //   ),
                             // );
+
+                            // if (_isVideoInitialized &&
+                            //     _videoPlayerController != null) {
+                            //   setState(() {
+                            //     _videoPlayerController!.value.isPlaying
+                            //         ? _videoPlayerController!.pause()
+                            //         : _videoPlayerController!.play();
+                            //   });
+                            // }
                           },
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(10),
-                            child: controller.isLoading.value
-                                ? Center(child: SizedBox())
-                                : Image.network(
-                                    controller.thumbnail.value,
+                          child: GestureDetector(
+                            onTap: () {
+                              print("Link ${controller.OriginalUrl.value}");
+
+                              // Navigator.push(
+                              //   context,
+                              //   MaterialPageRoute(
+                              //     builder: (_) =>
+                              //         VideoPage(videoUrl: _link.text),
+                              //   ),
+                              // );
+                            },
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(10),
+                              child: controller.isLoading.value
+                                  ? Center(child: SizedBox())
+                                  : Image.network(
+                                      controller.thumbnail.value,
+                                      fit: BoxFit.cover,
+                                      width: double.infinity,
+                                      errorBuilder:
+                                          (context, error, stackTrace) =>
+                                              const Icon(Icons.error),
+                                    ),
+                            ),
+                          ),
+                        ),
+
+                        // Download button with separate Obx
+                        Positioned(
+                          bottom: 65,
+                          left: 10,
+                          right: 10,
+                          child: Obx(() {
+                            final downloading = controller.isDownloading.value;
+                            return GestureDetector(
+                              onTap: () async {
+                                final originalUrl = _link.text.trim();
+                                final directUrl = controller.downloadUrl.value;
+
+                                if (originalUrl.isEmpty) {
+                                  Get.snackbar("Error", "URL not found!");
+                                  return;
+                                }
+
+                                if (directUrl.isEmpty) {
+                                  Get.snackbar(
+                                    "Error",
+                                    "No direct URL available!",
+                                  );
+                                  return;
+                                }
+
+                                // 🔹 Ask user for quality
+                                // final selectedQuality = await showQualityPopup(
+                                //   context,
+                                // );
+                                if (controller.medias.isNotEmpty) {
+                                  controller.showQualityDialog();
+                                } else {
+                                  controller.downloadDirectUrl(
+                                    controller.downloadUrl.value,
+                                    "Default",
+                                  );
+                                  //   Get.snackbar("", "No quality options available!");
+                                }
+                                // if (selectedQuality != null) {
+                                //   // Pass quality to your download method
+                                //   await controller.videoDownloadApi(
+                                //     directUrl,
+                                //    // "video_$selectedQuality",
+                                //   );
+                                //   Get.snackbar(
+                                //     "Download",
+                                //     "Downloading $selectedQuality quality...",
+                                //   );
+                                // }
+                              },
+
+                              child: Button(
+                                color: currentPlateForm['buttonColor'],
+                                text: Text(
+                                  downloading
+                                      ? "Downloading... ${controller.progress.value.toStringAsFixed(0)}%"
+                                      : "Download",
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ),
+                            );
+                          }),
+                        ),
+                        // Share button (no Obx needed, as it doesn't depend on reactive variables)
+                        Positioned(
+                          bottom: 10,
+                          left: 10,
+                          right: 10,
+                          child: GestureDetector(
+                            onTap: () {
+                              final url = _link.text.trim();
+                              if (url.isNotEmpty) {
+                                Share.share(
+                                  "Check out this video:\n$url",
+                                  subject: "Video Download Link",
+                                );
+                              } else {
+                                Get.snackbar("Error", "No link found!");
+                              }
+                            },
+                            child: const Button(
+                              color: Colors.white,
+                              text: Text(
+                                'Share',
+                                style: TextStyle(fontWeight: FontWeight.bold,fontSize: 12),
+                              ),
+                            ),
+                          ),
+                        ),
+                        // Positioned(
+                        //   bottom: 90,
+                        //   left:10,
+                        //   right: 10,
+                        //   child: ElevatedButton(
+                        //     onPressed: () async {
+                        //       final result = await showQualityPopup(context);
+                        //       if (result != null) {
+                        //         print("Selected Quality: $result");
+                        //       }
+                        //     },
+                        //     child: Text("Show Popup"),
+                        //   ),
+                        //
+                        // ),
+                      ],
+                    );
+                  } else {
+                    return Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const SizedBox(height: 12),
+                        Obx(() {
+                          return controller.isLoading.value
+                              ? Center(child: CircularProgressIndicator())
+                              : ClipRRect(
+                                  borderRadius: BorderRadius.circular(10),
+                                  child: Image.asset(
+                                    AppImages.HowToDownload,
                                     fit: BoxFit.cover,
                                     width: double.infinity,
                                     errorBuilder:
                                         (context, error, stackTrace) =>
                                             const Icon(Icons.error),
                                   ),
-                          ),
-                        ),
-                      ),
-
-                      // Download button with separate Obx
-                      Positioned(
-                        bottom: 65,
-                        left: 10,
-                        right: 10,
-                        child: Obx(() {
-                          final downloading = controller.isDownloading.value;
-                          return GestureDetector(
-                            onTap: () async {
-                              final originalUrl = _link.text.trim();
-                              final directUrl = controller.downloadUrl.value;
-
-                              if (originalUrl.isEmpty) {
-                                Get.snackbar("Error", "URL not found!");
-                                return;
-                              }
-
-                              if (directUrl.isEmpty) {
-                                Get.snackbar(
-                                  "Error",
-                                  "No direct URL available!",
                                 );
-                                return;
-                              }
-
-                              // 🔹 Ask user for quality
-                              // final selectedQuality = await showQualityPopup(
-                              //   context,
-                              // );
-                              if (controller.medias.isNotEmpty) {
-                                controller.showQualityDialog();
-                              } else {
-                                controller.downloadDirectUrl(controller.downloadUrl.value, "Default");
-                             //   Get.snackbar("", "No quality options available!");
-                              }
-                              // if (selectedQuality != null) {
-                              //   // Pass quality to your download method
-                              //   await controller.videoDownloadApi(
-                              //     directUrl,
-                              //    // "video_$selectedQuality",
-                              //   );
-                              //   Get.snackbar(
-                              //     "Download",
-                              //     "Downloading $selectedQuality quality...",
-                              //   );
-                              // }
-                            },
-
-                            child: Button(
-                              color: currentPlateForm['buttonColor'],
-                              text: Text(
-                                downloading
-                                    ? "Downloading... ${controller.progress.value.toStringAsFixed(0)}%"
-                                    : "Download",
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          );
                         }),
-                      ),
-                      // Share button (no Obx needed, as it doesn't depend on reactive variables)
-                      Positioned(
-                        bottom: 10,
-                        left: 10,
-                        right: 10,
-                        child: GestureDetector(
-                          onTap: () {
-                            final url = _link.text.trim();
-                            if (url.isNotEmpty) {
-                              Share.share(
-                                "Check out this video:\n$url",
-                                subject: "Video Download Link",
-                              );
-                            } else {
-                              Get.snackbar("Error", "No link found!");
-                            }
-                          },
-                          child: const Button(
-                            color: Colors.white,
-                            text: Text(
-                              'Share',
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                        ),
-                      ),
-                      // Positioned(
-                      //   bottom: 90,
-                      //   left:10,
-                      //   right: 10,
-                      //   child: ElevatedButton(
-                      //     onPressed: () async {
-                      //       final result = await showQualityPopup(context);
-                      //       if (result != null) {
-                      //         print("Selected Quality: $result");
-                      //       }
-                      //     },
-                      //     child: Text("Show Popup"),
-                      //   ),
-                      //
-                      // ),
-                    ],
-                  );
-                } else {
-                  return Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const SizedBox(height: 12),
-                      Obx(() {
-                        return controller.isLoading.value
-                            ? Center(child: CircularProgressIndicator())
-                            : ClipRRect(
-                                borderRadius: BorderRadius.circular(10),
-                                child: Image.asset(
-                                  AppImages.HowToDownload,
-                                  fit: BoxFit.cover,
-                                  width: double.infinity,
-                                  errorBuilder: (context, error, stackTrace) =>
-                                      const Icon(Icons.error),
-                                ),
-                              );
-                      }),
-                      const SizedBox(height: 12),
-                    ],
-                  );
-                }
-              }),
-            ),
-          ],
+                        const SizedBox(height: 12),
+                      ],
+                    );
+                  }
+                }),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -482,8 +532,8 @@ class HomeScreenState extends State<HomeScreen> {
     _link.clear();
     controller.thumbnail.value = "";
     controller.downloadUrl.value = "";
-    _videoPlayerController?.dispose(); // Dispose of previous controller
-    _videoPlayerController = null;
+    // _videoPlayerController?.dispose(); // Dispose of previous controller
+    // _videoPlayerController = null;
     _isVideoInitialized = false;
   }
 }
