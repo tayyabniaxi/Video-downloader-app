@@ -28,7 +28,8 @@ class _ToolsState extends State<Tools> {
     {'name': 'Icon Generator', 'icon': AppIcons.iconGenerator},
     {'name': 'Avatar Generator', 'icon': AppIcons.avatarGenerator},
     {'name': 'Dummy Text Generator', 'icon': AppIcons.dummyTextGenerator},
-    {'name': 'Website Screenshot', 'icon': AppIcons.screenshot}
+    {'name': 'Website Screenshot', 'icon': AppIcons.screenshot},
+    {'name': 'Qr Scanner', 'icon': AppIcons.qr_scanner}
   ];
 
   @override
@@ -90,6 +91,11 @@ class _ToolsState extends State<Tools> {
                     MaterialPageRoute(builder: (context) => DummyTextGenerator()),
                   );
                 case 'Website Screenshot':
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => WebsiteScreenshot()),
+                  );
+                  case 'Qr Scanner':
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => WebsiteScreenshot()),

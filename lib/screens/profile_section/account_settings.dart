@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:qaisar/components/custom_profile_card.dart';
 import 'package:qaisar/components/custom_text_field.dart';
 import 'package:qaisar/components/profile_appbar_row.dart';
+import 'package:qaisar/screens/profile_section/profile_section.dart';
 
 class AccountSettings extends StatefulWidget {
   const AccountSettings({super.key});
@@ -18,10 +20,35 @@ class _AccountSettingsState extends State<AccountSettings> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
-        title: ProfileAppbarRow(
-          width: width * 0.21,
-          text: 'Account Settings',
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text('Account Settings'),
+            InkWell(
+              onTap: (){
+                Get.to(ProfileSection());
+              },
+              child: Container(
+                width: 70,
+                height: 20,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  color: Color(0xff726DDE),
+                ),
+                child: Center(
+                  child: Text(
+                    "Save",
+                    style: TextStyle(color: Colors.white, fontSize: 12,fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
+        // title: ProfileAppbarRow(
+        //   width: width * 0.21,
+        //   text: 'Account Settings',
+        // ),
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -108,13 +135,28 @@ class _AccountSettingsState extends State<AccountSettings> {
                           color: Color(0xff726DDE),
                         ),
                       ),
-                      CustomProfileCard(height: height, width: width, text: 'Account Id',lastText: '00000000'),
-                      CustomProfileCard(height: height, width: width , text: 'Account Id', lastText: '01/01/2025'),
-                      CustomProfileCard(height: height, width: width , text: 'Account Id', lastText: '01/01/2025')
+                      CustomProfileCard(
+                        height: height,
+                        width: width,
+                        text: 'Account Id',
+                        lastText: '00000000',
+                      ),
+                      CustomProfileCard(
+                        height: height,
+                        width: width,
+                        text: 'Account Id',
+                        lastText: '01/01/2025',
+                      ),
+                      CustomProfileCard(
+                        height: height,
+                        width: width,
+                        text: 'Account Id',
+                        lastText: '01/01/2025',
+                      ),
                     ],
                   ),
                 ),
-              )
+              ),
             ],
           ),
         ),

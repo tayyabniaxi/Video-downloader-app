@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:qaisar/screens/profile_section/profile_section.dart';
 import '../assets/app_assets.dart';
+import '../screens/profile_section/premium.dart';
 
 class CustomRow extends StatelessWidget {
   const CustomRow({
@@ -22,7 +23,7 @@ class CustomRow extends StatelessWidget {
         if (logo != null) Image.asset(logo!, height: 24, width: 24),
 
         if (logo != null) SizedBox(width: width * 0.05),
-SizedBox(width: 5,),
+        SizedBox(width: 5),
         Expanded(
           child: Text(
             text,
@@ -35,17 +36,30 @@ SizedBox(width: 5,),
           ),
         ),
 
-        SizedBox(width: width),
+        //SizedBox(width: width),
 
-        GestureDetector(
-          onTap: () => Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => const ProfileSection()),
-          ),
-          child: CircleAvatar(
-            maxRadius: 17,
-            backgroundImage: AssetImage(AppImages.profileImage),
-          ),
+        Row(
+          children: [
+            GestureDetector(
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => Premium()),
+              ),
+              child: Image.asset(AppIcons.buttonPro),
+            ),
+            SizedBox(width: 10),
+
+            GestureDetector(
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const ProfileSection()),
+              ),
+              child: CircleAvatar(
+                maxRadius: 17,
+                backgroundImage: AssetImage(AppImages.profileImage),
+              ),
+            ),
+          ],
         ),
       ],
     );

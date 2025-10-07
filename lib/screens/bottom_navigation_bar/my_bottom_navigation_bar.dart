@@ -5,6 +5,9 @@ import 'package:qaisar/screens/other_tools/tools.dart';
 import 'package:qaisar/assets/app_assets.dart';
 import 'package:qaisar/screens/home_screen.dart';
 
+import '../../components/button.dart';
+import '../splash.dart' show Splash;
+
 class MyBottomNavigationBar extends StatefulWidget {
   final int initialIndex;
   const MyBottomNavigationBar({super.key, this.initialIndex = 0});
@@ -58,16 +61,42 @@ class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> {
         if (_lastPressedAt == null ||
             now.difference(_lastPressedAt!) > const Duration(seconds: 2)) {
           _lastPressedAt = now;
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Press back again to exit'),
-              duration: Duration(seconds: 2),
-              backgroundColor: Colors.black87,
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              backgroundColor: Colors.white,
+              title: Container(
+                  height: 50,
+                  width: 50,
+                  child: Image.asset(AppIcons.exitApp)),
+              content: Text('Did you want to exit the app ?'),
+              actions: [
+
+                InkWell(
+                  onTap: () {
+                  SystemNavigator.pop();
+                  },
+                  child: Button(
+                    color: Color(0xff726DDE),
+                    text: Text('Exit App',style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold )),
+                  ),
+                ),
+                SizedBox(height: 10,),
+                InkWell(
+                  onTap: () {
+                    Navigator.pop(context);
+                  },
+                  child: Button(
+                    color: Color(0xffE6E6E6),
+                    text: Text('No',style: TextStyle(color: Color(0xff726DDE),fontWeight: FontWeight.bold ),),
+                  ),
+                ),
+              ],
             ),
           );
           return;
         }
-        await SystemNavigator.pop();
+
       },
       child: Scaffold(
         backgroundColor: const Color(0xffffffff),

@@ -48,6 +48,8 @@ class AppIcons {
   static const proIcon = '${baseIconPath}Pro_Icon/Pro_Icon.png';
   static const history = '${baseIconPath}History/History.png';
   static const logoutIcon = '${baseIconPath}LogoutIcon/LogoutIcon.png';
+  static const logoutIconPopup = '${baseIconPath}logout/logout.png';
+  static const exitApp = '${baseIconPath}exitApp/exitApp.png';
   static const tick = '${baseIconPath}Tick.png';
   static const star = '${baseIconPath}star.png';
   static const historyPicture = '${baseIconPath}History/History.png';
@@ -56,6 +58,7 @@ class AppIcons {
   static const platformSelected = '${baseIconPath}platformSelected/platformSelected.png';
   static const otherToolsSelected = '${baseIconPath}otherToolsSelected/otherToolsSelected.png';
   static const homeSelected = '${baseIconPath}homeSelected/homeSelected.png';
+  static const qr_scanner = '${baseIconPath}qr_scanner/qr_scanner.png';
   // static const onBoard1 = '${baseIconPath}onboarding1.png';
   // static const onBoard2 = '${baseIconPath}onboarding2.png';
   // static const onBoard3 = '${baseIconPath}onboarding3.png';

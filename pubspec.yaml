@@ -140,6 +140,9 @@ flutter:
     - assets/icons/homeSelected/homeSelected.png
     - assets/icons/otherToolsSelected/otherToolsSelected.png
     - assets/icons/uploadIcon/uploadIcon.png
+    - assets/icons/qr_scanner/qr_scanner.png
+    - assets/icons/logout/logout.png
+    - assets/icons/exitApp/exitApp.png
     - .env
   #   - images/a_dot_ham.jpeg
 

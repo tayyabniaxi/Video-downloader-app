@@ -15,8 +15,8 @@ class ToolAppbarText extends StatelessWidget {
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
         Text(
           text,
           style: TextStyle(
@@ -25,13 +25,14 @@ class ToolAppbarText extends StatelessWidget {
             fontSize: 14,
           ),
         ),
-     //  SizedBox(width: width * 0.24),
+        //  SizedBox(width: width * 0.24),
         GestureDetector(
-            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => Premium())),
-            child: Image.asset(AppIcons.buttonPro)),
-
-
-
+          onTap: () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => Premium()),
+          ),
+          child: Image.asset(AppIcons.buttonPro),
+        ),
       ],
     );
   }
