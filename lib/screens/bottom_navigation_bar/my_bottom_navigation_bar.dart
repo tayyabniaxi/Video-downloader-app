@@ -4,6 +4,7 @@ import 'package:qaisar/screens/plateform.dart';
 import 'package:qaisar/screens/other_tools/tools.dart';
 import 'package:qaisar/assets/app_assets.dart';
 import 'package:qaisar/screens/home_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../components/button.dart';
 import '../splash.dart' show Splash;
@@ -23,12 +24,32 @@ class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> {
   Map<String, dynamic>? _selectedPlatform;
 
   DateTime? _lastPressedAt;
+  bool? _isLoggedIn;
 
   @override
   void initState() {
     super.initState();
     _selectedIndex = widget.initialIndex;
+    _loadLoginStatus();
   }
+
+
+  Future<void> _loadLoginStatus() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _isLoggedIn = prefs.getBool('isLoggedIn') ?? false; // Default to false (guest)
+    });
+  }
+
+  // Save login status to SharedPreferences
+  Future<void> _saveLoginStatus(bool isLoggedIn) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isLoggedIn', isLoggedIn);
+    setState(() {
+      _isLoggedIn = isLoggedIn;
+    });
+  }
+
 
   void _onItemTapped(int index) {
     setState(() {

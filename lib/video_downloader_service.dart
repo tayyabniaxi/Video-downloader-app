@@ -33,8 +33,6 @@ class VideoDownloaderService extends GetxController {
     return false;
   }
 
-
-
   var originalUrl = ''.obs;
   var medias = <Map<String, dynamic>>[].obs; // hold qualities
 
@@ -65,23 +63,43 @@ class VideoDownloaderService extends GetxController {
           /// Show popup after success
           // showQualityDialog();
         } else {
-           Get.snackbar(
-             titleText: Text("Error",style: TextStyle(color: Colors.red,fontWeight: FontWeight.bold),),
-             "Error",
-              "Video not found or Url not correct",
+          Get.snackbar(
+            titleText: Text(
+              "Error",
+              style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+            ),
+            "Error",
+            "Video not found or Url not correct",
           );
         }
       } else {
         final errorData = jsonDecode(response.body);
-         Get.snackbar(
-
-           titleText: Text("Error",style: TextStyle(color: Colors.red,fontWeight: FontWeight.bold,fontSize: 15),),
-           "Error",      "Video not found or Url not correct",);
+        Get.snackbar(
+          titleText: Text(
+            "Error",
+            style: TextStyle(
+              color: Colors.red,
+              fontWeight: FontWeight.bold,
+              fontSize: 15,
+            ),
+          ),
+          "Error",
+          "Video not found or Url not correct",
+        );
       }
     } catch (e) {
-        Get.snackbar(
-            titleText: Text("Error",style: TextStyle(color: Colors.red,fontSize:15,fontWeight: FontWeight.bold),),
-            "Error", "Video not found or Url not correct");
+      Get.snackbar(
+        titleText: Text(
+          "Error",
+          style: TextStyle(
+            color: Colors.red,
+            fontSize: 15,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        "Error",
+        "Video not found or Url not correct",
+      );
     }
   }
 
@@ -93,7 +111,7 @@ class VideoDownloaderService extends GetxController {
         insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
         backgroundColor: Colors.white,
         child: Obx(
-              () => Padding(
+          () => Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -118,41 +136,45 @@ class VideoDownloaderService extends GetxController {
                 const SizedBox(height: 12),
 
                 // Scrollable list of qualities
-                SizedBox(
-                  height: 500, // Constrain height to make list scrollable
-                  child: ListView(
-                    shrinkWrap: true,
-                    children: medias.map(
-                          (m) => Container(
-                        margin: const EdgeInsets.symmetric(vertical: 6),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12),
-                          color: Colors.grey.shade100,
-                        ),
-                        child: ListTile(
-                          onTap: () => selectedMedia.value = m,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          leading: Text(
-                            "MP4",
-                            style: TextStyle(
-                              color: Colors.purple,
-                              fontWeight: FontWeight.bold,
+                Flexible(
+                  child: SizedBox(
+                     // Constrain height to make list scrollable
+                    child: ListView(
+                      shrinkWrap: true,
+                      children: medias
+                          .map(
+                            (m) => Container(
+                              margin: const EdgeInsets.symmetric(vertical: 6),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(12),
+                                color: Colors.grey.shade100,
+                              ),
+                              child: ListTile(
+                                onTap: () => selectedMedia.value = m,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                leading: Text(
+                                  "MP4",
+                                  style: TextStyle(
+                                    color: Colors.purple,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                trailing: Text(
+                                  m['label'] ?? "Unknown",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    color: selectedMedia.value == m
+                                        ? Colors.purple
+                                        : Colors.black,
+                                  ),
+                                ),
+                              ),
                             ),
-                          ),
-                          trailing: Text(
-                            m['label'] ?? "Unknown",
-                            style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              color: selectedMedia.value == m
-                                  ? Colors.purple
-                                  : Colors.black,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ).toList(),
+                          )
+                          .toList(),
+                    ),
                   ),
                 ),
 
@@ -256,7 +278,8 @@ class VideoDownloaderService extends GetxController {
 
       Directory downloadsDir = Directory("/storage/emulated/0/Download");
       if (!downloadsDir.existsSync()) {
-        downloadsDir = await getExternalStorageDirectory() ??
+        downloadsDir =
+            await getExternalStorageDirectory() ??
             await getApplicationDocumentsDirectory();
       }
 
@@ -298,7 +321,6 @@ class VideoDownloaderService extends GetxController {
       isDownloading.value = false;
     }
   }
-
 
   @override
   void onClose() {

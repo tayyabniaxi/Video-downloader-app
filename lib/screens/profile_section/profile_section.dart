@@ -5,6 +5,7 @@ import 'package:qaisar/screens/profile_section/history.dart';
 import 'package:qaisar/screens/profile_section/premium.dart';
 import 'package:qaisar/screens/splash.dart';
 import 'package:qaisar/screens/splash_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../assets/app_assets.dart';
 import '../../components/button.dart';
 import '../../components/custom_list_tile.dart';
@@ -17,8 +18,20 @@ class ProfileSection extends StatefulWidget {
 }
 
 class _ProfileSectionState extends State<ProfileSection> {
+  bool? isLoggedIn;
+  void Loadstate() async {
+    final prefs = await SharedPreferences.getInstance();
+    isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
+  }
+
+  void initState() {
+    super.initState();
+    Loadstate();
+  }
+
   @override
   Widget build(BuildContext context) {
+    print(isLoggedIn);
     final width = MediaQuery.of(context).size.width;
     final height = MediaQuery.of(context).size.height;
 
@@ -33,28 +46,30 @@ class _ProfileSectionState extends State<ProfileSection> {
           children: [
             CircleAvatar(
               maxRadius: 35,
-              backgroundImage: AssetImage(AppImages.profileImage),
+              backgroundImage: AssetImage(AppIcons.profileavatar),
             ),
             SizedBox(height: height * 0.02),
             Text(
-              'Mark Jonson',
+              'Guest user',
               style: TextStyle(
                 fontFamily: 'Montserrat',
                 fontWeight: FontWeight.bold,
                 fontSize: 14,
               ),
             ),
-            Text(
-              'jonson077@gmail.com',
-              style: TextStyle(
-                fontFamily: 'Montserrat',
-                fontWeight: FontWeight.w500,
-                fontSize: 12,
+            if (isLoggedIn == "false")
+              Text(
+                'jonson077@gmail.com',
+                style: TextStyle(
+                  fontFamily: 'Montserrat',
+                  fontWeight: FontWeight.w500,
+                  fontSize: 12,
+                ),
               ),
-            ),
             SizedBox(height: height * 0.025),
 
             // Equal cards with less spacing
+            if (isLoggedIn == "false")
             GestureDetector(
               onTap: () => Navigator.push(
                 context,
@@ -91,7 +106,7 @@ class _ProfileSectionState extends State<ProfileSection> {
             ),
 
             SizedBox(height: height * 0.008),
-
+            if(isLoggedIn =="false")
             GestureDetector(
               onTap: () {
                 showDialog(
@@ -99,12 +114,12 @@ class _ProfileSectionState extends State<ProfileSection> {
                   builder: (context) => AlertDialog(
                     backgroundColor: Colors.white,
                     title: Container(
-                        height: 50,
-                        width: 50,
-                        child: Image.asset(AppIcons.logoutIconPopup)),
+                      height: 50,
+                      width: 50,
+                      child: Image.asset(AppIcons.logoutIconPopup),
+                    ),
                     content: Text('Are you sure you want to log out?'),
                     actions: [
-                    
                       InkWell(
                         onTap: () {
                           Navigator.pop(context);
@@ -115,17 +130,29 @@ class _ProfileSectionState extends State<ProfileSection> {
                         },
                         child: Button(
                           color: Color(0xff726DDE),
-                          text: Text('Yes',style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold )),
+                          text: Text(
+                            'Yes',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                         ),
                       ),
-                      SizedBox(height: 10,),
+                      SizedBox(height: 10),
                       InkWell(
                         onTap: () {
                           Navigator.pop(context);
                         },
                         child: Button(
                           color: Color(0xffE6E6E6),
-                          text: Text('No',style: TextStyle(color: Color(0xff726DDE),fontWeight: FontWeight.bold ),),
+                          text: Text(
+                            'No',
+                            style: TextStyle(
+                              color: Color(0xff726DDE),
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                         ),
                       ),
                     ],

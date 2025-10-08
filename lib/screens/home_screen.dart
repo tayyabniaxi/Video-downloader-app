@@ -139,17 +139,57 @@ class HomeScreenState extends State<HomeScreen> {
                       return "URL required";
                     }
 
-                    // 🔹 Basic URL pattern validation
-                    final urlPattern =
-                        r'^(https?:\/\/)?([\w\-]+\.)+[a-zA-Z]{2,}(:\d+)?(\/\S*)?$';
-                    final regExp = RegExp(urlPattern);
+                    final url = value.trim().toLowerCase();
 
-                    if (!regExp.hasMatch(value.trim())) {
+                    // 🌐 Basic URL format validation
+                    final urlPattern = r'^(https?:\/\/)?([\w\-]+\.)+[a-zA-Z]{2,}(:\d+)?(\/\S*)?$';
+                    final regExp = RegExp(urlPattern);
+                    if (!regExp.hasMatch(url)) {
                       return "Enter a valid URL";
+                    }
+
+                    // 🧠 Platform domain rules
+                    final platformTitle = currentPlateForm['name']?.toString().toLowerCase() ?? '';
+
+                    final Map<String, List<String>> platformDomains = {
+                      'youtube': ['youtube.com', 'youtu.be'],
+                      'facebook': ['facebook.com', 'fb.watch'],
+                      'instagram': ['instagram.com'],
+                      'tiktok': ['tiktok.com'],
+                      'twitter': ['twitter.com', 'x.com'],
+                      'pinterest': ['pinterest.com'],
+                      'linkedin': ['linkedin.com'],
+                      'reddit': ['reddit.com'],
+                      'threads': ['threads.net'],
+                      'snapchat': ['snapchat.com'],
+                      'dailymotion': ['dailymotion.com'],
+                      'vimeo': ['vimeo.com'],
+                      'Periscope': ['Periscope.com'],
+                      'Coursera': ['Coursera.video'],
+                      'Twitch': ['Twitch.co'],
+                      'BBC': ['BBC.co'],
+                      'CNN': ['CNN.co'],
+                      'ESPN': ['ESPN.co'],
+                      'Arte': ['Arte.co'],
+                      'Hot Star': ['Hot Star'],
+                      'Zee5': ['Zee5'],
+                      'SonyLiv': ['SonyLiv'],
+
+                    };
+
+                    // ✅ If platform is known, validate domain match
+                    if (platformDomains.containsKey(platformTitle)) {
+                      final validDomains = platformDomains[platformTitle]!;
+                      final isMatch = validDomains.any((domain) => url.contains(domain));
+                      if (!isMatch) {
+                        return "Please enter a valid ${platformTitle.capitalizeFirst!} URL";
+                      }
                     }
 
                     return null;
                   },
+
+
                   decoration: InputDecoration(
                     hintText: 'Paste URL Here',
                     hintStyle: const TextStyle(

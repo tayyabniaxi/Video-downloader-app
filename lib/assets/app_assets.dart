@@ -1,5 +1,6 @@
 class AppIcons {
   static const baseIconPath = 'assets/icons/';
+  static const profileavatar = '${baseIconPath}profileavatar.png';
   static const arrowIcon = '${baseIconPath}arrow.png';
   static const fb1 = '${baseIconPath}facebook1/facebook1.png';
   static const insta1 = '${baseIconPath}insta1/insta1.png';
