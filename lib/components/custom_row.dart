@@ -56,7 +56,7 @@ class CustomRow extends StatelessWidget {
               ),
               child: CircleAvatar(
                 maxRadius: 17,
-                backgroundImage: AssetImage(AppImages.profileImage),
+                backgroundImage: AssetImage(AppIcons.profileavatar),
               ),
             ),
           ],

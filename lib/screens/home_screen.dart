@@ -148,7 +148,9 @@ class HomeScreenState extends State<HomeScreen> {
                       return "Enter a valid URL";
                     }
 
-                    // 🧠 Platform domain rules
+                    // 🧠🧠🧠🧠
+                    //
+                    // Platform domain rules
                     final platformTitle = currentPlateForm['name']?.toString().toLowerCase() ?? '';
 
                     final Map<String, List<String>> platformDomains = {
@@ -160,20 +162,21 @@ class HomeScreenState extends State<HomeScreen> {
                       'pinterest': ['pinterest.com'],
                       'linkedin': ['linkedin.com'],
                       'reddit': ['reddit.com'],
-                      'threads': ['threads.net'],
+                     // 'threads': ['threads.net'],
                       'snapchat': ['snapchat.com'],
                       'dailymotion': ['dailymotion.com'],
                       'vimeo': ['vimeo.com'],
-                      'Periscope': ['Periscope.com'],
-                      'Coursera': ['Coursera.video'],
-                      'Twitch': ['Twitch.co'],
-                      'BBC': ['BBC.co'],
-                      'CNN': ['CNN.co'],
-                      'ESPN': ['ESPN.co'],
-                      'Arte': ['Arte.co'],
-                      'Hot Star': ['Hot Star'],
-                      'Zee5': ['Zee5'],
-                      'SonyLiv': ['SonyLiv'],
+                      'periscope': ['periscope.com'],
+                      'coursera': ['Coursera.video'],
+                      'twitch': ['twitch.com'],
+                      'bbc': ['bbc.com', 'bbc.co.uk'],
+                      'cnn': ['CNN.co'],
+                      'espn': ['ESPN.co'],
+                      'udemy': ['udemy.co'],
+                      'arte': ['Arte.co'],
+                      'hotstar': ['Hot Star'],
+                      'zee5': ['Zee5'],
+                      'sonyliv': ['SonyLiv'],
 
                     };
 

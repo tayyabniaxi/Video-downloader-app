@@ -257,18 +257,20 @@ class VideoDownloaderService extends GetxController {
   }
 
   Future<void> downloadDirectUrl(String videoUrl, String title) async {
-    if (videoUrl.isEmpty) {
-      Get.snackbar("Error", "Video URL not available");
+    // 🧠 Step 1: Validate input first
+    if (videoUrl.isEmpty || !videoUrl.startsWith('http')) {
+      Get.snackbar("Error", "Video not available or invalid URL");
       return;
     }
 
+    // 🧩 Step 2: Request permissions
     if (!await requestStoragePermission()) {
       Get.snackbar("Permission", "Storage permission denied");
       return;
     }
 
     try {
-      // 🔹 Cancel any ongoing download before starting a new one
+      // 🔄 Cancel previous download if running
       if (cancelToken != null && !cancelToken!.isCancelled) {
         cancelToken!.cancel("New download started");
       }
@@ -276,21 +278,37 @@ class VideoDownloaderService extends GetxController {
       isDownloading.value = true;
       cancelToken = CancelToken();
 
-      Directory downloadsDir = Directory("/storage/emulated/0/Download");
-      if (!downloadsDir.existsSync()) {
-        downloadsDir =
-            await getExternalStorageDirectory() ??
-            await getApplicationDocumentsDirectory();
+      // 📁 Step 3: Choose correct directory
+      Directory? downloadsDir;
+
+      if (Platform.isAndroid) {
+        downloadsDir = await getExternalStorageDirectory(); // App-specific folder
+      } else {
+        downloadsDir = await getApplicationDocumentsDirectory();
       }
 
-      String savePath = "${downloadsDir.path}/$title.mp4";
+      if (downloadsDir == null) {
+        Get.snackbar("Error", "Unable to access storage directory");
+        return;
+      }
+
+      String sanitizedTitle = title.replaceAll(RegExp(r'[\\/:*?"<>|]'), '_');
+      String savePath = "${downloadsDir.path}/$sanitizedTitle.mp4";
 
       Dio dio = Dio();
 
+      // 🧠 Step 4: Check if the URL actually exists (HEAD request)
+      final headResponse = await dio.head(videoUrl).catchError((_) => null);
+      if (headResponse == null || headResponse.statusCode != 200) {
+        Get.snackbar("Error", "Video not available at this URL");
+        return;
+      }
+
+      // 💾 Step 5: Start download
       await dio.download(
         videoUrl,
         savePath,
-        cancelToken: cancelToken, // ✅ attach token here
+        cancelToken: cancelToken,
         onReceiveProgress: (received, total) {
           if (total != -1) {
             progress.value = (received / total) * 100;
@@ -299,9 +317,10 @@ class VideoDownloaderService extends GetxController {
         },
       );
 
+      // 🖼️ Step 6: Save to gallery
       final result = await ImageGallerySaverPlus.saveFile(
         savePath,
-        name: title,
+        name: sanitizedTitle,
       );
 
       print("Saved to Gallery: $result");
@@ -312,15 +331,158 @@ class VideoDownloaderService extends GetxController {
         Get.snackbar("Cancelled", "Download cancelled");
       } else {
         print("Download error: $e");
-        Get.snackbar("Error", "Download failed:");
+        Get.snackbar("Error", "Download failed or video not found");
       }
     } catch (e) {
       print("Direct download error: $e");
-      Get.snackbar("Error", "Direct download failed ");
+      Get.snackbar("Error", "Video not available or download failed");
     } finally {
       isDownloading.value = false;
     }
   }
+
+  // Future<void> downloadDirectUrl(String videoUrl, String title) async {
+  //   if (videoUrl.isEmpty) {
+  //     Get.snackbar("Error", "Video URL not available");
+  //     return;
+  //   }
+  //
+  //   // 🔹 Request permissions
+  //   if (!await requestStoragePermission()) {
+  //     Get.snackbar("Permission", "Storage permission denied");
+  //     return;
+  //   }
+  //
+  //   try {
+  //     // 🔹 Cancel previous download if any
+  //     if (cancelToken != null && !cancelToken!.isCancelled) {
+  //       cancelToken!.cancel("New download started");
+  //     }
+  //
+  //     isDownloading.value = true;
+  //     cancelToken = CancelToken();
+  //
+  //     // ✅ Use correct directory for Android 11+
+  //     Directory? downloadsDir;
+  //
+  //     if (Platform.isAndroid) {
+  //       downloadsDir = await getExternalStorageDirectory(); // app-specific folder
+  //     } else {
+  //       downloadsDir = await getApplicationDocumentsDirectory();
+  //     }
+  //
+  //     if (downloadsDir == null) {
+  //       Get.snackbar("Error", "Unable to access storage directory");
+  //       return;
+  //     }
+  //
+  //     String sanitizedTitle = title.replaceAll(RegExp(r'[\\/:*?"<>|]'), '_');
+  //     String savePath = "${downloadsDir.path}/$sanitizedTitle.mp4";
+  //
+  //     Dio dio = Dio();
+  //
+  //     await dio.download(
+  //       videoUrl,
+  //       savePath,
+  //       cancelToken: cancelToken,
+  //       onReceiveProgress: (received, total) {
+  //         if (total != -1) {
+  //           progress.value = (received / total) * 100;
+  //           print("Download Progress: ${progress.value.toStringAsFixed(0)}%");
+  //         }
+  //       },
+  //     );
+  //
+  //     // ✅ Make visible in Gallery
+  //     final result = await ImageGallerySaverPlus.saveFile(
+  //       savePath,
+  //       name: sanitizedTitle,
+  //     );
+  //
+  //     print("Saved to Gallery: $result");
+  //     Get.snackbar("Success", "Video downloaded successfully");
+  //   } on DioException catch (e) {
+  //     if (CancelToken.isCancel(e)) {
+  //       print("Download cancelled: ${e.message}");
+  //       Get.snackbar("Cancelled", "Download cancelled");
+  //     } else {
+  //       print("Download error: $e");
+  //       Get.snackbar("Error", "Download failed");
+  //     }
+  //   } catch (e) {
+  //     print("Direct download error: $e");
+  //     Get.snackbar("Error", "Direct download failed");
+  //   } finally {
+  //     isDownloading.value = false;
+  //   }
+  // }
+
+  //
+  // Future<void> downloadDirectUrl(String videoUrl, String title) async {
+  //   if (videoUrl.isEmpty) {
+  //     Get.snackbar("Error", "Video URL not available");
+  //     return;
+  //   }
+  //
+  //   if (!await requestStoragePermission()) {
+  //     Get.snackbar("Permission", "Storage permission denied");
+  //     return;
+  //   }
+  //
+  //   try {
+  //     // 🔹 Cancel any ongoing download before starting a new one
+  //     if (cancelToken != null && !cancelToken!.isCancelled) {
+  //       cancelToken!.cancel("New download started");
+  //     }
+  //
+  //     isDownloading.value = true;
+  //     cancelToken = CancelToken();
+  //
+  //     Directory downloadsDir = Directory("/storage/emulated/0/Download");
+  //     if (!downloadsDir.existsSync()) {
+  //       downloadsDir =
+  //           await getExternalStorageDirectory() ??
+  //           await getApplicationDocumentsDirectory();
+  //     }
+  //
+  //     String savePath = "${downloadsDir.path}/$title.mp4";
+  //
+  //     Dio dio = Dio();
+  //
+  //     await dio.download(
+  //       videoUrl,
+  //       savePath,
+  //       cancelToken: cancelToken, // ✅ attach token here
+  //       onReceiveProgress: (received, total) {
+  //         if (total != -1) {
+  //           progress.value = (received / total) * 100;
+  //           print("Download Progress: ${progress.value.toStringAsFixed(0)}%");
+  //         }
+  //       },
+  //     );
+  //
+  //     final result = await ImageGallerySaverPlus.saveFile(
+  //       savePath,
+  //       name: title,
+  //     );
+  //
+  //     print("Saved to Gallery: $result");
+  //     Get.snackbar("Success", "Video downloaded successfully");
+  //   } on DioException catch (e) {
+  //     if (CancelToken.isCancel(e)) {
+  //       print("Download cancelled: ${e.message}");
+  //       Get.snackbar("Cancelled", "Download cancelled");
+  //     } else {
+  //       print("Download error: $e");
+  //       Get.snackbar("Error", "Download failed:");
+  //     }
+  //   } catch (e) {
+  //     print("Direct download error: $e");
+  //     Get.snackbar("Error", "Direct download failed ");
+  //   } finally {
+  //     isDownloading.value = false;
+  //   }
+  // }
 
   @override
   void onClose() {

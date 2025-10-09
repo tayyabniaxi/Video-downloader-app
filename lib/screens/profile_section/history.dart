@@ -74,7 +74,7 @@ class _HistoryState extends State<History> {
                   Image.asset(AppIcons.proIcon,width: 30,height: 30,),
                   SizedBox(width: 6),
                   Text(
-                    'Upgrade To Pro',
+                    'History no found',
                     style: TextStyle(
                       fontFamily: 'Montserrat',
                       fontWeight: FontWeight.w600,
